@@ -115,8 +115,15 @@ class Scene3D {
             0.1,
             1000
         );
-        this.camera.position.set(0, 1.2, CAMERA_DISTANCE);
+        this.updateCameraPosition();
         this.camera.lookAt(0, -0.2, 0);
+    }
+
+    updateCameraPosition() {
+        // Increase distance on mobile to make cube look smaller (7 vs 5)
+        const isMobile = window.innerWidth < 768;
+        const targetZ = isMobile ? 7 : CAMERA_DISTANCE;
+        this.camera.position.set(0, 1.2, targetZ);
     }
 
     setupLighting() {
@@ -387,6 +394,7 @@ class Scene3D {
         this.camera.aspect = window.innerWidth / window.innerHeight;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.updateCameraPosition();
     }
 
     animate() {

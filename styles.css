@@ -701,7 +701,8 @@ body.light-mode .section-content {
     }
 
     .hero-title {
-        font-size: clamp(2.5rem, 12vw, 4rem);
+        font-size: clamp(2rem, 10vw, 3rem);
+        /* Reduced from 2.5rem/12vw/4rem */
         margin-bottom: 1.5rem;
     }
 
