@@ -56,6 +56,10 @@ class Scene3D {
             5: '#contact'
         };
 
+        // Initialize smooth variables
+        this.currentScrollY = 0;
+        this.targetCameraZ = CAMERA_DISTANCE;
+
         this.init();
     }
 
@@ -120,8 +124,9 @@ class Scene3D {
     }
 
     updateCameraPosition() {
-        // User requested cube size to be consistent everywhere (removed mobile check)
-        this.camera.position.set(0, 1.2, CAMERA_DISTANCE);
+        // Smooth target set
+        this.targetCameraZ = CAMERA_DISTANCE;
+        // Immediate set only if uninitialized (optional check managed in animate)
     }
 
     setupLighting() {
@@ -398,6 +403,14 @@ class Scene3D {
     animate() {
         requestAnimationFrame(() => this.animate());
 
+        // Smooth Scroll Logic
+        this.currentScrollY += (window.scrollY - this.currentScrollY) * 0.1;
+
+        // Smooth Camera Z
+        if (this.camera) {
+            this.camera.position.z += (this.targetCameraZ - this.camera.position.z) * 0.05;
+        }
+
         // Idle rotation
         this.rotationY += 0.005; /* Increased speed from 0.001 */
         this.rotationY += this.velocity;
@@ -405,7 +418,7 @@ class Scene3D {
         if (Math.abs(this.velocity) < 0.0001) this.velocity = 0;
 
         // Scroll interaction
-        const scrollOffset = window.scrollY * 0.002; // Increased sensitivity slightly
+        const scrollOffset = this.currentScrollY * 0.002;
 
         if (this.model) {
             // Y rotation is driven by mouse/momentum/idle only
