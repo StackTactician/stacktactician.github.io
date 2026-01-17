@@ -694,7 +694,7 @@ body.light-mode .section-content {
     bottom: 0;
     left: auto;
     /* Only right side */
-    width: 75vw;
+    width: 50vw;
     max-width: 300px;
     z-index: 200;
     background: rgba(10, 10, 10, 0.95);
@@ -740,7 +740,7 @@ body.light-mode .mobile-menu {
 }
 
 .mobile-nav-link {
-    font-size: 2.5rem;
+    font-size: 1.5rem;
     font-weight: 300;
     color: var(--text-primary);
     text-decoration: none;
@@ -781,20 +781,22 @@ body.light-mode .mobile-menu {
     }
 
     .hero {
-        padding: 4rem 1rem;
-        justify-content: center;
-        /* Center content (lowering from top) */
+        padding: 6rem 1rem 2rem;
+        justify-content: flex-start;
+        /* Align content top */
     }
 
     .hero-subtitle {
         font-size: 0.75rem;
-        margin-bottom: 2rem;
+        margin-bottom: 0px;
     }
 
     .hero-title {
         font-size: clamp(3.5rem, 14vw, 5rem);
         /* Increased min from 3rem, max from 4.5rem */
         margin-bottom: 1.5rem;
+        margin-top: 25vh;
+        /* Push title down to create gap */
     }
 
     .hero-instruction {
