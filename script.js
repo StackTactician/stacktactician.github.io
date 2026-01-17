@@ -64,7 +64,7 @@ class Scene3D {
     }
 
     createParticles() {
-        const particleCount = 60; // Few and small as requested
+        const particleCount = 120; // Increased from 60
         const geometry = new THREE.BufferGeometry();
         const positions = new Float32Array(particleCount * 3);
         const sizes = new Float32Array(particleCount);
@@ -126,7 +126,11 @@ class Scene3D {
     updateCameraPosition() {
         // Smooth target set
         this.targetCameraZ = CAMERA_DISTANCE;
-        // Immediate set only if uninitialized (optional check managed in animate)
+
+        // Force immediate position if camera is at 0 (initialization)
+        if (this.camera && this.camera.position.z === 0) {
+            this.camera.position.z = this.targetCameraZ;
+        }
     }
 
     setupLighting() {
@@ -425,12 +429,13 @@ class Scene3D {
             this.model.rotation.y = this.rotationY;
 
             // X rotation is driven by scroll (vertical rotation) + default tilt
-            this.model.rotation.x = scrollOffset + 0.07;
+            this.model.rotation.x = scrollOffset + 0.6;
         }
 
         // Particle animation
         if (this.particles) {
-            this.particles.rotation.y = scrollOffset * 0.1;
+            // Constant background movement + scroll influence
+            this.particles.rotation.y += 0.002;
             this.particles.rotation.x = scrollOffset * 0.2; // Match main cube axis
         }
 
