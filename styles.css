@@ -691,9 +691,10 @@ body.light-mode .section-content {
     }
 
     .hero {
-        padding: 4rem 1.5rem;
-        justify-content: center;
-        /* Center content on mobile */
+        padding: 4rem 1.5rem 10rem 1.5rem;
+        /* Increased bottom padding to 10rem to raise text */
+        justify-content: flex-end;
+        /* Ensure content stays at bottom (now higher due to padding) */
     }
 
     .hero-subtitle {
@@ -701,8 +702,8 @@ body.light-mode .section-content {
     }
 
     .hero-title {
-        font-size: clamp(2rem, 10vw, 3rem);
-        /* Reduced from 2.5rem/12vw/4rem */
+        font-size: clamp(1.5rem, 8vw, 2.5rem);
+        /* Reduced from 2rem/10vw/3rem */
         margin-bottom: 1.5rem;
     }
 
