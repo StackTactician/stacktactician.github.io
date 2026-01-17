@@ -120,10 +120,8 @@ class Scene3D {
     }
 
     updateCameraPosition() {
-        // Increase distance on mobile to make cube look smaller (7 vs 5)
-        const isMobile = window.innerWidth < 768;
-        const targetZ = isMobile ? 7 : CAMERA_DISTANCE;
-        this.camera.position.set(0, 1.2, targetZ);
+        // User requested cube size to be consistent everywhere (removed mobile check)
+        this.camera.position.set(0, 1.2, CAMERA_DISTANCE);
     }
 
     setupLighting() {

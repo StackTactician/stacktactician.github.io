@@ -669,7 +669,8 @@ body.light-mode .section-content {
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
     .nav {
-        padding: 1rem 1.5rem;
+        padding: 1rem 0.5rem;
+        /* Reduced side padding to move logo left */
     }
 
     .nav-logo-img {
@@ -697,7 +698,8 @@ body.light-mode .section-content {
     }
 
     .hero {
-        padding: 6rem 1.5rem 2rem;
+        padding: 6rem 1rem 2rem;
+        /* Match nav padding */
         justify-content: flex-start;
         /* Align content top */
     }
@@ -708,8 +710,8 @@ body.light-mode .section-content {
     }
 
     .hero-title {
-        font-size: clamp(2rem, 10vw, 3rem);
-        /* Reduced from 2.5rem/12vw/4rem */
+        font-size: clamp(3rem, 12vw, 4.5rem);
+        /* Increased back up */
         margin-bottom: 1.5rem;
     }
 
@@ -724,7 +726,8 @@ body.light-mode .section-content {
     }
 
     .section-title {
-        font-size: 2.5rem;
+        font-size: 3rem;
+        /* Increased from 2.5rem */
     }
 
     .work-item {
