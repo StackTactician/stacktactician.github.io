@@ -552,19 +552,42 @@ let scene3DInstance = null;
 
 function initThemeToggle() {
     const toggleBtn = document.getElementById('themeToggle');
-    const themeIcon = toggleBtn?.querySelector('.theme-icon');
-    if (!toggleBtn) return;
+    const mobileToggleBtn = document.getElementById('mobileThemeToggle');
 
-    let isLightMode = false;
-    toggleBtn.addEventListener('click', () => {
+    // Helper to update UI
+    const updateUI = (isLight) => {
+        const icon = isLight ? '☾' : '☀';
+        const transform = isLight ? 'rotate(360deg)' : 'rotate(0deg)';
+
+        if (toggleBtn) {
+            const i = toggleBtn.querySelector('.theme-icon');
+            if (i) { i.textContent = icon; i.style.transform = transform; }
+        }
+        if (mobileToggleBtn) {
+            const i = mobileToggleBtn.querySelector('.theme-icon');
+            if (i) { i.textContent = icon; i.style.transform = transform; }
+        }
+    };
+
+    // Check initial state
+    let isLightMode = document.body.classList.contains('light-mode') || localStorage.getItem('theme') === 'light';
+    if (isLightMode) {
+        document.body.classList.add('light-mode');
+        updateUI(true);
+        if (scene3DInstance) scene3DInstance.setLightMode(true);
+    }
+
+    const handleToggle = () => {
         isLightMode = !isLightMode;
         document.body.classList.toggle('light-mode', isLightMode);
-        if (themeIcon) {
-            themeIcon.textContent = isLightMode ? '☾' : '☀';
-            themeIcon.style.transform = isLightMode ? 'rotate(360deg)' : 'rotate(0deg)';
-        }
+        localStorage.setItem('theme', isLightMode ? 'light' : 'dark');
+
+        updateUI(isLightMode);
         if (scene3DInstance) scene3DInstance.setLightMode(isLightMode);
-    });
+    };
+
+    if (toggleBtn) toggleBtn.addEventListener('click', handleToggle);
+    if (mobileToggleBtn) mobileToggleBtn.addEventListener('click', handleToggle);
 }
 
 // ============================================
@@ -614,6 +637,37 @@ function initBackToTop() {
 }
 
 // ============================================
+// Mobile Menu
+// ============================================
+function initMobileMenu() {
+    const menuBtn = document.querySelector('.mobile-menu-btn');
+    const menu = document.querySelector('.mobile-menu');
+    const closeBtn = document.querySelector('.mobile-menu-close');
+    const links = document.querySelectorAll('.mobile-nav-link');
+
+    const toggleMenu = () => {
+        const isActive = menu.classList.contains('active');
+        if (isActive) {
+            menu.classList.remove('active');
+            document.body.style.overflow = '';
+        } else {
+            menu.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+    };
+
+    if (menuBtn) menuBtn.addEventListener('click', toggleMenu);
+    if (closeBtn) closeBtn.addEventListener('click', toggleMenu);
+
+    links.forEach(link => {
+        link.addEventListener('click', () => {
+            menu.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+    });
+}
+
+// ============================================
 // Initialize
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
@@ -625,4 +679,5 @@ document.addEventListener('DOMContentLoaded', () => {
     initNavigationScroll();
     initBackToTop();
     initThemeToggle();
+    initMobileMenu();
 });

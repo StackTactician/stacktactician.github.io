@@ -12,7 +12,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@200;300;400;500;600;700&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=21">
+    <link rel="stylesheet" href="styles.css?v=24">
 </head>
 
 <body>
@@ -50,7 +50,28 @@
                 <span class="theme-icon">☀</span>
             </button>
         </div>
+
+        <!-- Mobile Menu Button -->
+        <button class="mobile-menu-btn" aria-label="Open menu">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </button>
     </nav>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu">
+        <button class="mobile-menu-close" aria-label="Close menu">×</button>
+        <div class="mobile-nav-links">
+            <a href="#about" class="mobile-nav-link">About</a>
+            <a href="#work" class="mobile-nav-link">Work</a>
+            <a href="#contact" class="mobile-nav-link">Contact</a>
+            <button class="theme-toggle" id="mobileThemeToggle" aria-label="Toggle light mode"
+                style="margin-top: 2rem; width: 40px; height: 40px; font-size: 1.2rem;">
+                <span class="theme-icon">☀</span>
+            </button>
+        </div>
+    </div>
 
     <!-- Hero Section -->
     <section class="hero" id="hero">
