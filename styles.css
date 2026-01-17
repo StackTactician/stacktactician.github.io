@@ -689,7 +689,13 @@ body.light-mode .section-content {
 
 .mobile-menu {
     position: fixed;
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: auto;
+    /* Only right side */
+    width: 75vw;
+    max-width: 300px;
     z-index: 200;
     background: rgba(10, 10, 10, 0.95);
     /* Deep dark for contrast */
@@ -702,6 +708,8 @@ body.light-mode .section-content {
     gap: 2rem;
     transform: translateX(100%);
     transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+    /* Shadow on left */
 }
 
 body.light-mode .mobile-menu {
@@ -773,10 +781,9 @@ body.light-mode .mobile-menu {
     }
 
     .hero {
-        padding: 6rem 1rem 2rem;
-        /* Match nav padding */
-        justify-content: flex-start;
-        /* Align content top */
+        padding: 4rem 1rem;
+        justify-content: center;
+        /* Center content (lowering from top) */
     }
 
     .hero-subtitle {
