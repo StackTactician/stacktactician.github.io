@@ -124,11 +124,24 @@ class Scene3D {
     }
 
     updateCameraPosition() {
-        // Smooth target set
-        this.targetCameraZ = CAMERA_DISTANCE;
+        // Standard distance
+        let targetZ = CAMERA_DISTANCE;
 
-        // Force immediate position if camera is at 0 (initialization)
-        if (this.camera && this.camera.position.z === 0) {
+        // Mobile adjustment: 
+        // When aspect ratio is low (portrait), the fixed vertical FOV causes the cube to look huge 
+        // if the height increases (e.g. address bar hides).
+        // We scale distance inversely with aspect ratio to maintain a roughly constant *visual width*.
+        // constant 2.8 ensures that at 9:16 aspect (0.56), distance is ~5 (matching default).
+        if (this.camera && this.camera.aspect < 0.6) {
+            targetZ = Math.max(CAMERA_DISTANCE, 2.8 / this.camera.aspect);
+        }
+
+        this.targetCameraZ = targetZ;
+
+        // Force immediate position update
+        // This prevents "jelly"/"bounce" effects when the browser resizes (e.g. mobile address bar)
+        // because the renderer updates the FOV immediately. We must match that speed.
+        if (this.camera) {
             this.camera.position.z = this.targetCameraZ;
         }
     }
