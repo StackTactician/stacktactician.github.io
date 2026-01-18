@@ -1064,16 +1064,6 @@ body.light-mode .mobile-menu {
 
     /* Terminal mobile adjustments */
     .terminal {
-        position: relative;
-        bottom: auto;
-        right: auto;
-        width: 100%;
-        max-width: none;
-        margin-top: 2rem;
-        font-size: 0.75rem;
-    }
-
-    .terminal-body {
-        max-height: 120px;
+        display: none;
     }
 }
