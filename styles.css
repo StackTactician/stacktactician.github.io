@@ -64,6 +64,18 @@ body {
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     transition: background-color 0.2s ease, color 0.2s ease;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* Allow selection on interactive elements */
+a,
+button,
+input,
+textarea,
+.terminal-body {
+    user-select: text;
+    -webkit-user-select: text;
 }
 
 /* ===== Loading Screen ===== */
@@ -1064,6 +1076,6 @@ body.light-mode .mobile-menu {
 
     /* Terminal mobile adjustments */
     .terminal {
-        display: none;
+        display: none !important;
     }
 }
