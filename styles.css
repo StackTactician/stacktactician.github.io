@@ -435,6 +435,223 @@ body.light-mode .nav-logo-text {
     background: var(--color-gray-600);
 }
 
+/* ===== Interactive Terminal ===== */
+.terminal {
+    position: fixed;
+    bottom: 2rem;
+    right: 6rem;
+    width: 380px;
+    max-width: calc(100vw - 2rem);
+    background: rgba(0, 0, 0, 0.85);
+    border: 1px solid var(--color-gray-700);
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    font-size: 0.8rem;
+    overflow: hidden;
+    pointer-events: auto;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    /* Smooth transitions for minimize/restore */
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.light-mode .terminal {
+    background: rgba(255, 255, 255, 0.9);
+    border-color: var(--color-gray-300);
+}
+
+.terminal-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.5rem 0.75rem;
+    background: var(--color-gray-900);
+    border-bottom: 1px solid var(--color-gray-800);
+}
+
+body.light-mode .terminal-header {
+    background: var(--color-gray-100);
+    border-color: var(--color-gray-200);
+}
+
+.terminal-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--color-gray-600);
+}
+
+.terminal-dot:nth-child(1) {
+    background: #ff5f56;
+}
+
+.terminal-dot:nth-child(2) {
+    background: #ffbd2e;
+}
+
+.terminal-dot:nth-child(3) {
+    background: #27c93f;
+}
+
+.terminal-title {
+    margin-left: auto;
+    font-size: 0.7rem;
+    color: var(--color-gray-500);
+    letter-spacing: 0.05em;
+}
+
+.terminal-minimize {
+    background: none;
+    border: none;
+    color: var(--color-gray-400);
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 0.25rem;
+    margin-left: 0.5rem;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.terminal-minimize:hover {
+    color: var(--text-primary);
+    transform: scale(1.2);
+}
+
+/* Minimized state - small floating button */
+.terminal.minimized .terminal-body,
+.terminal.minimized .terminal-input-line {
+    max-height: 0;
+    padding: 0;
+    opacity: 0;
+    overflow: hidden;
+    border: none;
+}
+
+.terminal.minimized .terminal-dot,
+.terminal.minimized .terminal-title {
+    display: none;
+}
+
+.terminal.minimized {
+    width: 50px;
+    min-width: 50px;
+    max-width: 50px;
+    border-radius: 50%;
+}
+
+.terminal.minimized .terminal-header {
+    padding: 0;
+    border: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+}
+
+.terminal.minimized .terminal-minimize {
+    font-size: 1rem;
+    font-weight: bold;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.terminal-body {
+    padding: 0.75rem;
+    max-height: 150px;
+    overflow-y: auto;
+    color: var(--color-gray-300);
+    transition: max-height 0.25s cubic-bezier(0.4, 0, 0.2, 1), padding 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+}
+
+body.light-mode .terminal-body {
+    color: var(--color-gray-700);
+}
+
+.terminal-line {
+    margin-bottom: 0.4rem;
+    line-height: 1.5;
+}
+
+.terminal-line:last-child {
+    margin-bottom: 0;
+}
+
+.terminal-cmd {
+    color: var(--color-white);
+    font-weight: 600;
+}
+
+body.light-mode .terminal-cmd {
+    color: var(--color-black);
+}
+
+.terminal-input-line {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-top: 1px solid var(--color-gray-800);
+    background: rgba(0, 0, 0, 0.3);
+    transition: max-height 0.25s cubic-bezier(0.4, 0, 0.2, 1), padding 0.25s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+    max-height: 50px;
+}
+
+body.light-mode .terminal-input-line {
+    border-color: var(--color-gray-200);
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.terminal-prompt {
+    color: var(--color-gray-400);
+    font-weight: 600;
+}
+
+.terminal-input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: inherit;
+    caret-color: var(--text-primary);
+}
+
+.terminal-input::placeholder {
+    color: var(--color-gray-600);
+}
+
+body.light-mode .terminal-input::placeholder {
+    color: var(--color-gray-400);
+}
+
+/* Blinking cursor effect via caret */
+@keyframes blink {
+
+    0%,
+    50% {
+        opacity: 1;
+    }
+
+    51%,
+    100% {
+        opacity: 0;
+    }
+}
+
+.terminal-input:focus {
+    animation: none;
+    /* Browser caret handles it */
+}
+
 /* ===== Sections ===== */
 section {
     position: relative;
@@ -843,5 +1060,20 @@ body.light-mode .mobile-menu {
         width: 40px;
         height: 40px;
         font-size: 1.2rem;
+    }
+
+    /* Terminal mobile adjustments */
+    .terminal {
+        position: relative;
+        bottom: auto;
+        right: auto;
+        width: 100%;
+        max-width: none;
+        margin-top: 2rem;
+        font-size: 0.75rem;
+    }
+
+    .terminal-body {
+        max-height: 120px;
     }
 }

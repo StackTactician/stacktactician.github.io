@@ -60,6 +60,10 @@ class Scene3D {
         this.currentScrollY = 0;
         this.targetCameraZ = CAMERA_DISTANCE;
 
+        // Store initial dimensions for mobile stability
+        this.lockedWidth = null;
+        this.lockedHeight = null;
+
         this.init();
     }
 
@@ -124,25 +128,10 @@ class Scene3D {
     }
 
     updateCameraPosition() {
-        // Standard distance
-        let targetZ = CAMERA_DISTANCE;
-
-        // Mobile adjustment: 
-        // When aspect ratio is low (portrait), the fixed vertical FOV causes the cube to look huge 
-        // if the height increases (e.g. address bar hides).
-        // We scale distance inversely with aspect ratio to maintain a roughly constant *visual width*.
-        // constant 2.8 ensures that at 9:16 aspect (0.56), distance is ~5 (matching default).
-        if (this.camera && this.camera.aspect < 0.6) {
-            targetZ = Math.max(CAMERA_DISTANCE, 2.8 / this.camera.aspect);
-        }
-
-        this.targetCameraZ = targetZ;
-
-        // Force immediate position update
-        // This prevents "jelly"/"bounce" effects when the browser resizes (e.g. mobile address bar)
-        // because the renderer updates the FOV immediately. We must match that speed.
+        // Fixed camera distance - never changes
+        this.targetCameraZ = CAMERA_DISTANCE;
         if (this.camera) {
-            this.camera.position.z = this.targetCameraZ;
+            this.camera.position.z = CAMERA_DISTANCE;
         }
     }
 
@@ -411,9 +400,34 @@ class Scene3D {
     }
 
     onResize() {
-        this.camera.aspect = window.innerWidth / window.innerHeight;
+        const isMobile = window.innerWidth < 768;
+        const newWidth = window.innerWidth;
+        const newHeight = window.innerHeight;
+
+        // On mobile, lock dimensions after first load.
+        // Only resize if width changes (orientation change).
+        // This prevents the address bar toggle from affecting cube size.
+        if (isMobile) {
+            if (this.lockedWidth === null) {
+                // First load: store initial dimensions
+                this.lockedWidth = newWidth;
+                this.lockedHeight = newHeight;
+            } else if (newWidth !== this.lockedWidth) {
+                // Width changed (orientation change) - update lock
+                this.lockedWidth = newWidth;
+                this.lockedHeight = newHeight;
+            } else {
+                // Only height changed (address bar) - ignore
+                return;
+            }
+        }
+
+        // Apply resize
+        const w = isMobile ? this.lockedWidth : newWidth;
+        const h = isMobile ? this.lockedHeight : newHeight;
+        this.camera.aspect = w / h;
         this.camera.updateProjectionMatrix();
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setSize(w, h);
         this.updateCameraPosition();
     }
 
@@ -699,6 +713,130 @@ function initMobileMenu() {
 }
 
 // ============================================
+// Interactive Terminal
+// ============================================
+function initTerminal() {
+    const input = document.getElementById('terminalInput');
+    const output = document.getElementById('terminalOutput');
+    if (!input || !output) return;
+
+    const commands = {
+        help: () => {
+            return `Available commands:
+  <span class="terminal-cmd">help</span>          - Show this help message
+  <span class="terminal-cmd">download --resume</span> - Download my resume
+  <span class="terminal-cmd">about</span>         - Learn about me
+  <span class="terminal-cmd">skills</span>        - List my skills
+  <span class="terminal-cmd">contact</span>       - Get my contact info
+  <span class="terminal-cmd">clear</span>         - Clear the terminal`;
+        },
+        'download --resume': () => {
+            // Trigger download
+            const link = document.createElement('a');
+            link.href = 'assets/resume.pdf';
+            link.download = 'Mubarak_Mustapha_Resume.pdf';
+            link.click();
+            return 'Downloading resume...';
+        },
+        about: () => {
+            document.querySelector('#about')?.scrollIntoView({ behavior: 'smooth' });
+            return 'Scrolling to About section...';
+        },
+        skills: () => {
+            return `My skills:
+  • Cybersecurity
+  • Python
+  • Django / FastAPI
+  • SQL
+  • Linux`;
+        },
+        contact: () => {
+            return `Contact me:
+  Email: mmmoyosore09@gmail.com
+  GitHub: github.com/StackTactician
+  LinkedIn: linkedin.com/in/mubarak-mustapha-75b4b6300`;
+        },
+        clear: () => {
+            output.innerHTML = '';
+            return null; // No output
+        }
+    };
+
+    const addLine = (text, isCommand = false) => {
+        if (text === null) return;
+        const line = document.createElement('div');
+        line.className = 'terminal-line';
+
+        if (isCommand) {
+            line.innerHTML = `<span class="terminal-prompt">$</span> ${text}`;
+            output.appendChild(line);
+            output.scrollTop = output.scrollHeight;
+        } else {
+            // Typing animation for output
+            output.appendChild(line); // Append empty line first
+
+            let i = 0;
+            // Preserving HTML tags during typing is tricky, so for simplicity we'll 
+            // set innerHTML immediately but hide it, then reveal chars? 
+            // Actually, simplest consistent way for this scale is to just type plain text 
+            // or render HTML immediately if it contains tags to avoid breaking markup.
+
+            if (text.includes('<')) {
+                // If contains HTML (like the help command), render immediately for safety
+                line.innerHTML = text.replace(/\n/g, '<br>');
+                output.scrollTop = output.scrollHeight;
+            } else {
+                // Plain text - type it out
+                const typeChar = () => {
+                    if (i < text.length) {
+                        line.textContent += text.charAt(i);
+                        i++;
+                        output.scrollTop = output.scrollHeight;
+                        setTimeout(typeChar, 10); // 10ms speed
+                    }
+                };
+                typeChar();
+            }
+        }
+    };
+
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            const cmd = input.value.trim().toLowerCase();
+            if (!cmd) return;
+
+            addLine(input.value, true);
+            input.value = '';
+
+            const handler = commands[cmd];
+            if (handler) {
+                const result = handler();
+                addLine(result);
+            } else {
+                addLine(`Command not found: ${cmd}. Type <span class="terminal-cmd">help</span> for available commands.`);
+            }
+        }
+    });
+
+    // Focus terminal when clicking on it
+    document.getElementById('terminal')?.addEventListener('click', (e) => {
+        // Don't focus if clicking minimize button
+        if (e.target.closest('.terminal-minimize')) return;
+        input.focus();
+    });
+
+    // Minimize/restore toggle
+    const terminal = document.getElementById('terminal');
+    const minimizeBtn = document.getElementById('terminalMinimize');
+    if (minimizeBtn && terminal) {
+        minimizeBtn.addEventListener('click', () => {
+            terminal.classList.toggle('minimized');
+            minimizeBtn.innerHTML = terminal.classList.contains('minimized') ? '&gt;_' : '−';
+        });
+    }
+}
+
+// ============================================
 // Initialize
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
@@ -711,4 +849,5 @@ document.addEventListener('DOMContentLoaded', () => {
     initBackToTop();
     initThemeToggle();
     initMobileMenu();
+    initTerminal();
 });

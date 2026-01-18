@@ -86,6 +86,26 @@
                 <a href="#work" class="btn">View Work</a>
             </div>
         </div>
+
+        <!-- Interactive Terminal -->
+        <div class="terminal minimized" id="terminal">
+            <div class="terminal-header" id="terminalHeader">
+                <span class="terminal-dot"></span>
+                <span class="terminal-dot"></span>
+                <span class="terminal-dot"></span>
+                <span class="terminal-title">guest@portfolio</span>
+                <button class="terminal-minimize" id="terminalMinimize" aria-label="Restore terminal">&gt;_</button>
+            </div>
+            <div class="terminal-body" id="terminalOutput">
+                <div class="terminal-line">Welcome! Type <span class="terminal-cmd">help</span> for available commands.
+                </div>
+            </div>
+            <div class="terminal-input-line">
+                <span class="terminal-prompt">$</span>
+                <input type="text" class="terminal-input" id="terminalInput" autocomplete="off" spellcheck="false"
+                    placeholder="type a command...">
+            </div>
+        </div>
     </section>
 
     <!-- About Section -->
