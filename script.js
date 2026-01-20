@@ -163,7 +163,7 @@ class Scene3D {
         const faceConfigs = [
             { type: 'image', image: 'assets/linkedin.svg', url: 'https://www.linkedin.com/in/mubarak-mustapha-75b4b6300/' },
             { type: 'image', image: 'assets/github.svg', url: 'https://github.com/StackTactician' },
-            { type: 'image', image: 'assets/discord.svg', url: 'https://discord.com/users/1116656832220504104' },
+            { type: 'image', image: 'assets/lazyhooks.svg', url: 'https://pypi.org/project/lazyhooks/', isBlackIcon: true },
             { type: 'image', image: 'assets/mail.svg', url: 'mailto:mmmoyosore09@gmail.com' },
             { type: 'image', image: 'assets/x.svg', url: 'https://x.com/notyet_him' },
             { type: 'image', image: 'assets/whatsapp.svg', url: 'https://wa.me/2347036944371' }
@@ -172,7 +172,7 @@ class Scene3D {
         this.faceConfigs = faceConfigs;
         this.normalMaterials = faceConfigs.map(config => {
             if (config.type === 'image') {
-                return this.createImageMaterial(config.image);
+                return this.createImageMaterial(config.image, config.isBlackIcon);
             } else {
                 return this.createTextMaterial(config.text);
             }
@@ -209,14 +209,15 @@ class Scene3D {
         this.scene.add(this.model);
     }
 
-    createImageMaterial(url) {
+    createImageMaterial(url, isBlackIcon = false) {
         const texture = new THREE.TextureLoader().load(url);
         // texture.minFilter = THREE.LinearFilter;
 
         return new THREE.ShaderMaterial({
             uniforms: {
                 map: { value: texture },
-                invertAmount: { value: 0.0 }
+                invertAmount: { value: 0.0 },
+                isBlackIcon: { value: isBlackIcon ? 1.0 : 0.0 }
             },
             vertexShader: `
                 varying vec2 vUv;
@@ -228,6 +229,7 @@ class Scene3D {
             fragmentShader: `
                 uniform sampler2D map;
                 uniform float invertAmount;
+                uniform float isBlackIcon;
                 varying vec2 vUv;
                 
                 void main() {
@@ -243,16 +245,24 @@ class Scene3D {
                     // 3. Logo (Texture)
                     // Scale down slightly to fit inside border
                     vec2 center = vec2(0.5);
-                    vec2 scaledUv = (vUv - center) * 1.5 + center; // 1.5x zoom out (make smaller)
+                    vec2 scaledUv = (vUv - center) * 1.2 + center; // 1.2x zoom out (make slightly smaller than full)
                     
                     // Check bounds to prevent repeating/clamping artifiacts if using unclamped texture
                     if (scaledUv.x >= 0.0 && scaledUv.x <= 1.0 && scaledUv.y >= 0.0 && scaledUv.y <= 1.0) {
                         vec4 tex = texture2D(map, scaledUv);
+                        vec3 texColor = tex.rgb;
+                        
+                        // If it's a black icon, invert the texture color to make it white (for dark mode base)
+                        if (isBlackIcon > 0.5) {
+                            texColor = vec3(1.0) - texColor;
+                        }
+                        
                         // Mix based on alpha
-                        color = mix(color, tex.rgb, tex.a);
+                        color = mix(color, texColor, tex.a);
                     }
 
                     // 4. Invert Logic
+                    // This inverts the FINAL composed color (Bg + Border + Logo)
                     vec3 inverted = vec3(1.0) - color;
                     vec3 final = mix(color, inverted, invertAmount);
                     
@@ -494,7 +504,7 @@ class Scene3D {
 
             const material = this.model.material[i];
             if (material && material.uniforms && material.uniforms.invertAmount) {
-                const combinedInvert = Math.abs(this.globalInvert - this.hoverIntensity[i]);
+                let combinedInvert = Math.abs(this.globalInvert - this.hoverIntensity[i]);
                 material.uniforms.invertAmount.value = combinedInvert;
             }
         }
@@ -530,7 +540,11 @@ function initScrollAnimations() {
 
     sections.forEach(section => {
         section.style.opacity = '0';
-        section.style.transform = 'translateY(40px)';
+
+        // Use a larger offset for the project details card to give it a distinct "slide up" feel
+        const yOffset = section.classList.contains('project-details') ? '100px' : '40px';
+        section.style.transform = `translateY(${yOffset})`;
+
         section.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
         observer.observe(section);
     });
@@ -744,11 +758,11 @@ function initTerminal() {
         },
         skills: () => {
             return `My skills:
-  • Cybersecurity
+  • Scripting
   • Python
   • Django / FastAPI
   • SQL
-  • Linux`;
+  • Basic Linux`;
         },
         contact: () => {
             return `Contact me:

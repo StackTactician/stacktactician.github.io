@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Moyo's Portfolio - Backend Developer & Cybersecurity Professional">
-    <link rel="icon" type="image/svg+xml" href="assets/profile.svg">
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
     <title>Stacktactician | Portfolio</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -48,7 +48,8 @@
         </div>
         <div class="nav-links">
             <a href="#about" class="nav-link">About</a>
-            <a href="#work" class="nav-link">Work</a>
+            <a href="#work" class="nav-link">Projects</a>
+            <a href="#experience" class="nav-link">Experience</a>
             <a href="#contact" class="nav-link">Contact</a>
             <button class="theme-toggle" id="themeToggle" aria-label="Toggle light mode">
                 <span class="theme-icon">☀</span>
@@ -68,7 +69,8 @@
         <button class="mobile-menu-close" aria-label="Close menu">×</button>
         <div class="mobile-nav-links">
             <a href="#about" class="mobile-nav-link">About</a>
-            <a href="#work" class="mobile-nav-link">Work</a>
+            <a href="#work" class="mobile-nav-link">Projects</a>
+            <a href="#experience" class="mobile-nav-link">Experience</a>
             <a href="#contact" class="mobile-nav-link">Contact</a>
             <button class="theme-toggle" id="mobileThemeToggle" aria-label="Toggle light mode"
                 style="margin-top: 2rem; width: 40px; height: 40px; font-size: 1.2rem;">
@@ -162,23 +164,92 @@
     <section class="work" id="work">
         <div class="section-content">
             <span class="section-number">02</span>
-            <h2 class="section-title">Selected Work</h2>
+            <h2 class="section-title">Selected Projects</h2>
             <div class="work-list">
-                <article class="work-item">
+                <a href="#lazyhooks" class="work-item" style="text-decoration: none; color: inherit;">
                     <span class="work-year">2026</span>
-                    <h3 class="work-name">Nothing to see here yet, just a placeholder</h3>
-                    <span class="work-category">lmfaooo</span>
-                </article>
-                <article class="work-item">
-                    <span class="work-year">2025</span>
-                    <h3 class="work-name">Nothing to see here yet, just a placeholder</h3>
-                    <span class="work-category">lmfaooo</span>
-                </article>
-                <article class="work-item">
-                    <span class="work-year">2025</span>
-                    <h3 class="work-name">Nothing to see here yet, just a placeholder</h3>
-                    <span class="work-category">lmfaooo</span>
-                </article>
+                    <h3 class="work-name">LazyHooks</h3>
+                    <span class="work-category">Python / Webhooks</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- LazyHooks Detail Section -->
+    <section class="project-details" id="lazyhooks">
+        <div class="section-content">
+            <span class="section-number">2.1</span>
+            <div class="section-title-container"
+                style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+                <img src="assets/lazyhooks.svg" class="section-logo" alt="LazyHooks Logo">
+                <h2 class="section-title" style="margin-bottom: 0;">LazyHooks</h2>
+            </div>
+            <p class="section-text">
+                The easy way to handle webhooks in Python. Includes automatic retries, signing, and verification.
+                Built on asyncio and aiohttp for high performance.
+            </p>
+
+            <div class="project-features">
+                <h3 class="feature-title">Key Features</h3>
+                <ul class="feature-list">
+                    <li><strong>Simple API:</strong> Send webhooks with minimal boilerplate.</li>
+                    <li><strong>Async First:</strong> Built for high concurrency.</li>
+                    <li><strong>Secure:</strong> Built-in HMAC-SHA256 signing.</li>
+                    <li><strong>Reliable:</strong> SQLite persistence & automatic retries.</li>
+                </ul>
+            </div>
+
+            <div class="code-preview">
+                <div class="code-header">
+                    <span class="code-dot red"></span>
+                    <span class="code-dot yellow"></span>
+                    <span class="code-dot green"></span>
+                    <span class="code-title">example.py</span>
+                </div>
+                <pre><code class="language-python">import asyncio
+from lazyhooks import WebhookSender
+
+async def main():
+    sender = WebhookSender(signing_secret="super-secret")
+    
+    await sender.send("https://example.com/webhook", {
+        "event": "user_signup",
+        "user_id": 12345
+    })
+
+asyncio.run(main())</code></pre>
+            </div>
+
+            <div class="project-links">
+                <a href="https://github.com/StackTactician/LazyHooks" target="_blank" class="btn">View on GitHub</a>
+                <a href="https://pypi.org/project/lazyhooks/" target="_blank" class="btn btn-outline">View on PyPI</a>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Experience Section -->
+    <section class="experience" id="experience">
+        <div class="section-content">
+            <span class="section-number">03</span>
+            <h2 class="section-title">Experience</h2>
+            <div class="experience-list">
+                <div class="experience-item">
+                    <div class="experience-date">Dec 2025 - Present</div>
+                    <div class="experience-content">
+                        <h3 class="role-title">Software Engineer Intern</h3>
+                        <h4 class="company-name">
+                            <img src="assets/tweakrr.svg" alt="Tweakrr Logo" class="company-logo">
+                            <a href="https://tweakrr.com/" target="_blank"
+                                style="color: inherit; text-decoration: none; border-bottom: 1px solid var(--color-gray-600);">Tweakrr</a>
+                        </h4>
+                        <ul class="experience-description">
+                            <li>Built the automated payout system for the referral program.</li>
+                            <li>Created logic to verify and qualify successful referrals.</li>
+                            <li>Developed core backend services for the platform.</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </section>

@@ -415,17 +415,18 @@ body.light-mode .nav-logo-text {
     font-weight: 400;
     letter-spacing: 0.15em;
     text-transform: uppercase;
-    text-decoration: none;
     color: var(--bg-primary);
     background: var(--text-primary);
-    border: none;
+    border: 1px solid var(--text-primary);
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .btn:hover {
-    opacity: 0.9;
+    opacity: 1;
     transform: translateY(-2px);
+    background: var(--bg-primary);
+    color: var(--text-primary);
 }
 
 .hero-instruction {
@@ -798,6 +799,156 @@ body.light-mode .section-content {
     transform: translateX(10px);
 }
 
+/* ===== Project Details Section ===== */
+.project-features {
+    margin: 3rem 0;
+}
+
+.feature-title {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+}
+
+.section-logo {
+    height: 60px;
+    width: auto;
+    filter: invert(1);
+    /* Default dark mode: Black SVG -> White */
+    transition: filter 0.2s ease;
+}
+
+body.light-mode .section-logo {
+    filter: invert(0);
+    /* Light mode: Black SVG -> Black */
+}
+
+.feature-list {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.feature-list li {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.feature-list li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: var(--text-primary);
+}
+
+.feature-list strong {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+/* Code Preview */
+.code-preview {
+    background: #0a0a0a;
+    border: 1px solid var(--color-gray-800);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 3rem 0;
+    font-family: 'JetBrains Mono', monospace;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.code-preview:hover {
+    transform: translateY(-5px);
+    border-color: var(--color-gray-600);
+}
+
+.code-header {
+    background: var(--color-gray-900);
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--color-gray-800);
+}
+
+.code-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.code-dot.red {
+    background: #ff5f56;
+}
+
+.code-dot.yellow {
+    background: #ffbd2e;
+}
+
+.code-dot.green {
+    background: #27c93f;
+}
+
+.code-title {
+    margin-left: auto;
+    font-size: 0.8rem;
+    color: var(--color-gray-500);
+}
+
+.code-preview pre {
+    padding: 1.5rem;
+    overflow-x: auto;
+    color: #e5e5e5;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+/* Syntax Highlighting Sim (Basic) */
+.language-python {
+    color: #cccccc;
+}
+
+/* Project Links */
+.project-links {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 3rem;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--text-primary);
+    color: var(--text-primary);
+}
+
+.btn-outline:hover {
+    background: var(--text-primary);
+    color: var(--bg-primary);
+}
+
+/* Light Mode Overrides for Project Details */
+body.light-mode .code-preview {
+    background: #ffffff;
+    border-color: var(--color-gray-200);
+}
+
+body.light-mode .code-header {
+    background: var(--color-gray-100);
+    border-color: var(--color-gray-200);
+}
+
+body.light-mode .code-preview pre {
+    color: #1a1a1a;
+}
+
+body.light-mode .language-python {
+    color: #333333;
+}
+
 .work-year {
     font-size: 0.85rem;
     font-weight: 300;
@@ -1077,5 +1228,190 @@ body.light-mode .mobile-menu {
     /* Terminal mobile adjustments */
     .terminal {
         display: none !important;
+    }
+}
+
+/* ===== Experience Section ===== */
+.experience-list {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+    position: relative;
+    padding-left: 2rem;
+    border-left: 1px solid var(--color-gray-800);
+}
+
+.experience-item {
+    position: relative;
+}
+
+.experience-item::before {
+    content: "";
+    position: absolute;
+    left: -2rem;
+    top: 5px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--color-gray-900);
+    border: 2px solid var(--color-gray-600);
+    transform: translateX(-50%);
+    transition: all 0.3s ease;
+}
+
+.experience-item:hover::before {
+    background: var(--text-primary);
+    border-color: var(--text-primary);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.experience-date {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.role-title {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+
+.company-name {
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.company-logo {
+    height: 1.2rem;
+    width: auto;
+    border-radius: 4px;
+    filter: invert(1);
+    transition: filter 0.3s ease;
+}
+
+.experience-description {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.experience-description li {
+    font-size: 0.95rem;
+    color: var(--color-gray-400);
+    margin-bottom: 0.5rem;
+    padding-left: 1.25rem;
+    position: relative;
+    line-height: 1.6;
+}
+
+.experience-description li::before {
+    content: "▹";
+    position: absolute;
+    left: 0;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    top: 2px;
+}
+
+/* Hover Effect */
+.experience-item:hover .role-title {
+    color: var(--color-white);
+}
+
+.experience-item:hover .experience-description li {
+    color: var(--text-secondary);
+}
+
+/* Light Mode Overrides */
+body.light-mode .experience-list {
+    border-left-color: var(--color-gray-300);
+}
+
+body.light-mode .experience-item::before {
+    background: var(--color-gray-100);
+    border-color: var(--color-gray-400);
+}
+
+body.light-mode .experience-item:hover::before {
+    background: var(--text-primary);
+    border-color: var(--text-primary);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+body.light-mode .experience-item:hover .role-title {
+    color: var(--color-black);
+}
+
+body.light-mode .company-logo {
+    filter: invert(0);
+}
+
+/* ===== Mobile Responsiveness for New Sections ===== */
+@media (max-width: 768px) {
+
+    /* Experience Section */
+    .experience-list {
+        padding-left: 1.5rem;
+        gap: 2rem;
+    }
+
+    .experience-item::before {
+        left: -1.5rem;
+        width: 8px;
+        height: 8px;
+        top: 6px;
+    }
+
+    .role-title {
+        font-size: 1.1rem;
+    }
+
+    .company-name {
+        font-size: 0.95rem;
+    }
+
+    .experience-description li {
+        font-size: 0.9rem;
+    }
+
+    /* LazyHooks / Project Detail Section */
+    .project-detail {
+        padding: 4rem 1.5rem;
+        /* Reduce padding */
+    }
+
+    .project-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .project-features {
+        grid-template-columns: 1fr;
+        /* Stack features */
+    }
+
+    .code-preview {
+        margin-top: 2rem;
+    }
+
+    .project-links {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+
+    .project-links .btn {
+        width: 100%;
+        text-align: center;
     }
 }
