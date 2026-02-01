@@ -68,6 +68,17 @@ body {
     -webkit-user-select: none;
 }
 
+/* Custom text selection highlighting */
+::selection {
+    background: var(--text-primary);
+    color: var(--bg-primary);
+}
+
+::-moz-selection {
+    background: var(--text-primary);
+    color: var(--bg-primary);
+}
+
 /* Allow selection on interactive elements */
 a,
 button,
@@ -76,6 +87,60 @@ textarea,
 .terminal-body {
     user-select: text;
     -webkit-user-select: text;
+}
+
+/* ===== Light Mode Background Logos ===== */
+.bg-logos {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+/* Only show in light mode */
+body.light-mode .bg-logos {
+    opacity: 1;
+}
+
+.bg-logo {
+    position: absolute;
+    width: 8rem;
+    height: 8rem;
+    color: rgba(0, 0, 0, 0.04);
+    transition: color 0.3s ease;
+}
+
+.bg-logo svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* Slightly larger logos for some variety */
+.bg-logo:nth-child(2),
+.bg-logo:nth-child(5),
+.bg-logo:nth-child(9) {
+    width: 10rem;
+    height: 10rem;
+}
+
+.bg-logo:nth-child(4),
+.bg-logo:nth-child(7) {
+    width: 6rem;
+    height: 6rem;
+}
+
+.bg-logo:nth-child(11) {
+    width: 5rem;
+    height: 5rem;
+}
+
+/* Hide on mobile - too cramped */
+@media (max-width: 768px) {
+    .bg-logos {
+        display: none;
+    }
 }
 
 /* ===== Loading Screen ===== */
@@ -729,6 +794,34 @@ body.light-mode .section-content {
     transition: color 0.2s ease;
 }
 
+/* ===== Skills (Simple Icons) ===== */
+.skills {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+}
+
+.skill {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    color: var(--color-gray-500);
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.skill svg {
+    width: 100%;
+    height: 100%;
+}
+
+.skill:hover {
+    color: var(--text-primary);
+    transform: translateY(-3px);
+}
+
 /* ===== Skills Grid ===== */
 .skills-grid {
     display: grid;
@@ -770,6 +863,11 @@ body.light-mode .skill-card:hover {
     color: var(--color-gray-400);
     margin-bottom: 0.5rem;
     transition: color 0.3s ease;
+}
+
+.skill-icon svg {
+    width: 100%;
+    height: 100%;
 }
 
 .skill-card:hover .skill-icon {
@@ -929,9 +1027,9 @@ textarea.form-input {
 .btn-submit {
     margin-top: 1rem;
     padding: 1.25rem 2rem;
-    background: var(--color-white);
-    color: var(--color-black);
-    border: none;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--text-primary);
     font-family: var(--font-main);
     font-weight: 400;
     /* Standard button weight */
@@ -943,11 +1041,13 @@ textarea.form-input {
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    transition: transform 0.2s ease;
+    transition: all 0.2s ease;
 }
 
 .btn-submit:hover {
     transform: translateY(-2px);
+    background: var(--text-primary);
+    color: var(--bg-primary);
 }
 
 .btn-submit .arrow {
@@ -1573,5 +1673,136 @@ body.light-mode .company-logo {
     .project-links .btn {
         width: 100%;
         text-align: center;
+    }
+}
+
+/* ===== Work Item Hover Accordion ===== */
+.work-item-wrapper {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.work-item-header {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding: 1.5rem 0;
+    cursor: pointer;
+    transition: padding 0.4s ease-out;
+}
+
+.work-item-wrapper.expanded .work-item-header {
+    padding: 2rem 0;
+}
+
+.work-year {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-family: monospace;
+    letter-spacing: 0.1em;
+}
+
+.work-name {
+    flex: 1;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
+}
+
+.work-item-wrapper.expanded .work-name {
+    color: var(--text-secondary);
+}
+
+.work-category {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Toggle Button */
+.work-toggle {
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.work-toggle:hover {
+    background: var(--text-primary);
+}
+
+.work-toggle:hover .toggle-icon {
+    stroke: var(--bg-primary);
+}
+
+.toggle-icon {
+    width: 1rem;
+    height: 1rem;
+    stroke: var(--text-primary);
+    transition: transform 0.3s ease;
+}
+
+/* When expanded, rotate the plus to become an X */
+.work-item-wrapper.expanded .toggle-icon {
+    transform: rotate(45deg);
+}
+
+/* Expandable Detail Section */
+.work-item-detail {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease-out, opacity 0.4s ease-out;
+    opacity: 0;
+}
+
+.work-item-wrapper.expanded .work-item-detail {
+    max-height: 1500px;
+    /* Large enough to fit content */
+    opacity: 1;
+}
+
+.detail-inner {
+    padding: 2rem 0 3rem 0;
+    border-top: 1px solid var(--border-color);
+}
+
+.detail-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+/* Mobile responsiveness for accordion */
+@media (max-width: 768px) {
+    .work-item-header {
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .work-name {
+        flex: 100%;
+        order: -1;
+        font-size: 1.4rem;
+    }
+
+    .work-year {
+        font-size: 0.75rem;
+    }
+
+    .work-category {
+        font-size: 0.8rem;
+    }
+
+    .work-toggle {
+        margin-left: auto;
     }
 }

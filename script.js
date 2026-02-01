@@ -64,6 +64,10 @@ class Scene3D {
         this.lockedWidth = null;
         this.lockedHeight = null;
 
+        // Background Logos for Light Mode
+        this.bgLogos = [];
+        this.bgLogoGroup = new THREE.Group();
+
         this.init();
     }
 
@@ -95,6 +99,79 @@ class Scene3D {
         this.scene.add(this.particles);
     }
 
+    createBackgroundLogos() {
+        // Assets available: python, sql, django, fastapi, linux
+        const logoUrls = [
+            'assets/python.svg',
+            'assets/sql.svg',
+            'assets/django.svg',
+            'assets/fastapi.svg',
+            'assets/linux.svg'
+        ];
+
+        const loader = new THREE.TextureLoader();
+        const logoCount = logoUrls.length; // Exactly 5 logos
+        const placedLogos = [];
+
+        for (let i = 0; i < logoCount; i++) {
+            const url = logoUrls[i]; // One unique logo each
+
+            loader.load(url, (texture) => {
+                // Determine aspect ratio if possible, or just assume square/contain
+                // For simple SVGs, square logic is usually fine or we scale slightly
+
+                const material = new THREE.MeshBasicMaterial({
+                    map: texture,
+                    transparent: true,
+                    opacity: 0, // Start invisible, controlled by light mode
+                    color: 0xaaaaaa, // Tint gray so they aren't stark black/white
+                    side: THREE.DoubleSide
+                });
+
+                const size = 3.0 + Math.random() * 2.0; // Larger size 3.0 - 5.0
+                const radius = size / 2;
+                const geometry = new THREE.PlaneGeometry(size, size);
+                const mesh = new THREE.Mesh(geometry, material);
+
+                // Collision-checked placement: 3 Left, 2 Right
+                let x, y;
+                let overlap = true;
+                let attempts = 0;
+                const isLeft = i < 3;
+
+                while (overlap && attempts < 200) {
+                    x = isLeft ? (-4 - Math.random() * 21) : (4 + Math.random() * 21);
+                    y = (Math.random() - 0.5) * 30;
+                    overlap = false;
+                    for (const p of placedLogos) {
+                        if (Math.sqrt((x - p.x) ** 2 + (y - p.y) ** 2) < radius + p.r + 5) {
+                            overlap = true;
+                            break;
+                        }
+                    }
+                    attempts++;
+                }
+                if (overlap) return; // Skip if couldn't place
+
+                mesh.position.x = x;
+                mesh.position.y = y;
+                mesh.position.z = -5 - Math.random() * 5;
+
+                // Static Rotation
+                mesh.rotation.z = (Math.random() - 0.5) * 0.5;
+                mesh.rotation.x = 0;
+                mesh.rotation.y = 0;
+
+                placedLogos.push({ x, y, r: radius });
+
+                // (No animation props - logos are static)
+
+                this.bgLogoGroup.add(mesh);
+                this.bgLogos.push(mesh);
+            });
+        }
+    }
+
     init() {
         this.setupScene();
         this.setupCamera();
@@ -102,6 +179,7 @@ class Scene3D {
         this.setupRenderer();
         this.createPlaceholder();
         this.createParticles();
+        this.createBackgroundLogos();
         this.bindEvents();
         this.animate();
         if (this.onReady) this.onReady();
@@ -110,6 +188,7 @@ class Scene3D {
     setupScene() {
         this.scene = new THREE.Scene();
         this.scene.background = new THREE.Color(0x0a0a0a);
+        this.scene.add(this.bgLogoGroup);
     }
 
     setLightMode(isLight) {
@@ -161,7 +240,7 @@ class Scene3D {
     createPlaceholder() {
         // Face config: type can be 'text' or 'image'
         const faceConfigs = [
-            { type: 'image', image: 'assets/linkedin.svg', url: 'https://www.linkedin.com/in/mubarak-mustapha-75b4b6300/' },
+            { type: 'image', image: 'assets/linkedin.svg', url: 'https://www.linkedin.com/in/mubarak-mustapha-75b4b6300/', isBlackIcon: true },
             { type: 'image', image: 'assets/github.svg', url: 'https://github.com/StackTactician' },
             { type: 'image', image: 'assets/lazyhooks.svg', url: 'https://pypi.org/project/lazyhooks/', isBlackIcon: true },
             { type: 'image', image: 'assets/mail.svg', url: 'mailto:mmmoyosore09@gmail.com' },
@@ -342,9 +421,9 @@ class Scene3D {
     }
 
     onClick(e) {
-        // Only block if clicking an INTERACTIVE element. 
+        // Only block if clicking an INTERACTIVE or OVERLAY element. 
         // Allow clicking through the hero container or text if it's not a link/button.
-        if (e.target.closest('a, button, .nav, .work-item, .contact-email, .social-link')) return;
+        if (e.target.closest('a, button, input, textarea, .nav, .work-item, .contact-email, .social-link, .section-content, .terminal, .mobile-menu')) return;
 
         this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
         this.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
@@ -489,6 +568,16 @@ class Scene3D {
         if (this.particles) {
             const particleColor = 1 - this.globalInvert;
             this.particles.material.color.setRGB(particleColor, particleColor, particleColor);
+        }
+
+        // Background Logos Animation
+        if (this.bgLogos && this.bgLogos.length > 0) {
+            const targetLogoOpacity = this.globalInvert * 0.05; // Max opacity 0.05 when in light mode
+
+            this.bgLogos.forEach(logo => {
+                // Fade opacity
+                logo.material.opacity += (targetLogoOpacity - logo.material.opacity) * 0.1;
+            });
         }
 
         this.updateHoverTransitions();
@@ -851,6 +940,73 @@ function initTerminal() {
 }
 
 // ============================================
+// Contact Form Handling (Formspree)
+// ============================================
+function initContactForm() {
+    const form = document.getElementById('contactForm');
+
+    if (form) {
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const btn = form.querySelector('.btn-submit');
+            const btnText = btn.querySelector('.btn-text');
+            const arrow = btn.querySelector('.arrow');
+            const originalText = btnText.textContent;
+
+            // Set loading state
+            btnText.textContent = 'SENDING...';
+            btn.classList.add('loading');
+
+            const data = new FormData(form);
+            const action = form.action;
+
+            try {
+                const response = await fetch(action, {
+                    method: 'POST',
+                    body: data,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    // Success
+                    btnText.textContent = 'MESSAGE SENT!';
+                    btn.classList.add('success');
+                    form.reset();
+
+                    // Reset button after 3 seconds
+                    setTimeout(() => {
+                        btnText.textContent = originalText;
+                        btn.classList.remove('loading', 'success');
+                    }, 3000);
+                } else {
+                    // Error
+                    const jsonData = await response.json();
+                    if (Object.hasOwn(jsonData, 'errors')) {
+                        btnText.textContent = jsonData["errors"].map(error => error["message"]).join(", ");
+                    } else {
+                        btnText.textContent = 'ERROR!';
+                    }
+
+                    setTimeout(() => {
+                        btnText.textContent = originalText;
+                        btn.classList.remove('loading');
+                    }, 3000);
+                }
+            } catch (error) {
+                btnText.textContent = 'ERROR!';
+                setTimeout(() => {
+                    btnText.textContent = originalText;
+                    btn.classList.remove('loading');
+                }, 3000);
+            }
+        });
+    }
+}
+
+// ============================================
 // Initialize
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
@@ -864,4 +1020,18 @@ document.addEventListener('DOMContentLoaded', () => {
     initThemeToggle();
     initMobileMenu();
     initTerminal();
+    initContactForm();
 });
+
+// ============================================
+// Work Item Accordion Toggle
+// ============================================
+function toggleWorkItem(headerElement) {
+    const wrapper = headerElement.closest('.work-item-wrapper');
+    if (wrapper) {
+        wrapper.classList.toggle('expanded');
+    }
+}
+
+// Make it globally accessible
+window.toggleWorkItem = toggleWorkItem;
