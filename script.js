@@ -4,7 +4,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-console.log('Script loaded successfully');
 
 // ============================================
 // CONFIGURATION
@@ -438,7 +437,7 @@ class Scene3D {
 
                 // If it's an icon with a URL, open it
                 if (faceConfig && faceConfig.url) {
-                    window.open(faceConfig.url, '_blank');
+                    window.open(faceConfig.url, '_blank', 'noopener,noreferrer');
                     return;
                 }
 
@@ -871,7 +870,8 @@ function initTerminal() {
         line.className = 'terminal-line';
 
         if (isCommand) {
-            line.innerHTML = `<span class="terminal-prompt">$</span> ${text}`;
+            const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            line.innerHTML = `<span class="terminal-prompt">$</span> ${escaped}`;
             output.appendChild(line);
             output.scrollTop = output.scrollHeight;
         } else {

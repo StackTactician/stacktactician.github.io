@@ -79,15 +79,6 @@ body {
     color: var(--bg-primary);
 }
 
-/* Allow selection on interactive elements */
-a,
-button,
-input,
-textarea,
-.terminal-body {
-    user-select: text;
-    -webkit-user-select: text;
-}
 
 /* ===== Light Mode Background Logos ===== */
 .bg-logos {
