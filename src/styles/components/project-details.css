@@ -1,0 +1,171 @@
+/* ===== Project Details Section ===== */
+.project-features {
+    margin: 3rem 0;
+}
+
+.feature-title {
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+}
+
+.section-logo {
+    height: 60px;
+    width: auto;
+    filter: invert(1);
+    /* Default dark mode: Black SVG -> White */
+    transition: filter 0.2s ease;
+}
+
+body.light-mode .section-logo {
+    filter: invert(0);
+    /* Light mode: Black SVG -> Black */
+}
+
+.feature-list {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.feature-list li {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.feature-list li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: var(--text-primary);
+}
+
+.feature-list strong {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+/* Code Preview */
+.code-preview {
+    background: #0a0a0a;
+    border: 1px solid var(--color-gray-800);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 3rem 0;
+    font-family: 'JetBrains Mono', monospace;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.code-preview:hover {
+    transform: translateY(-5px);
+    border-color: var(--color-gray-600);
+}
+
+.code-header {
+    background: var(--color-gray-900);
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--color-gray-800);
+}
+
+.code-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.code-dot.red {
+    background: #ff5f56;
+}
+
+.code-dot.yellow {
+    background: #ffbd2e;
+}
+
+.code-dot.green {
+    background: #27c93f;
+}
+
+.code-title {
+    margin-left: auto;
+    font-size: 0.8rem;
+    color: var(--color-gray-500);
+}
+
+.code-preview pre {
+    padding: 1.5rem;
+    overflow-x: auto;
+    color: #e5e5e5;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+/* Syntax Highlighting Sim (Basic) */
+.language-python {
+    color: #cccccc;
+}
+
+/* Project Links */
+.project-links {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 3rem;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--text-primary);
+    color: var(--text-primary);
+}
+
+.btn-outline:hover {
+    background: var(--text-primary);
+    color: var(--bg-primary);
+}
+
+/* Light Mode Overrides for Project Details */
+body.light-mode .code-preview {
+    background: #ffffff;
+    border-color: var(--color-gray-200);
+}
+
+body.light-mode .code-header {
+    background: var(--color-gray-100);
+    border-color: var(--color-gray-200);
+}
+
+body.light-mode .code-preview pre {
+    color: #1a1a1a;
+}
+
+body.light-mode .language-python {
+    color: #333333;
+}
+
+.work-year {
+    font-size: 0.85rem;
+    font-weight: 300;
+    color: var(--text-muted);
+}
+
+.work-name {
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--text-secondary);
+    transition: all 0.3s ease;
+    display: inline-block;
+    /* Required for transform */
+}
+
+.work-category {
+    font-size: 0.8rem;
+    font-weight: 300;
+    color: var(--color-gray-600);
+    text-align: right;
+}

@@ -1,0 +1,215 @@
+/* ===== Contact Section Redesign ===== */
+.contact-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+    font-family: var(--font-main);
+    /* Ensure font inheritance */
+}
+
+@media (max-width: 768px) {
+    .contact-container {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+}
+
+.section-subtitle {
+    font-size: 0.85rem;
+    font-weight: 300;
+    /* Lighter weight */
+    letter-spacing: 0.1em;
+    color: var(--color-gray-500);
+    margin-bottom: 0.5rem;
+}
+
+.contact-title {
+    font-size: 3.5rem;
+    font-weight: 200;
+    /* Match section-title weight */
+    line-height: 1;
+    margin-bottom: 4rem;
+    color: var(--text-primary);
+}
+
+.contact-social-large {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.social-link-large {
+    font-size: 2.5rem;
+    font-weight: 200;
+    /* Match heavy thin mechanic of the site */
+    color: var(--color-gray-600);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.3s ease, transform 0.3s ease;
+    width: fit-content;
+    display: inline-flex;
+    align-items: center;
+    overflow: hidden;
+}
+
+.social-link-large:hover {
+    color: var(--text-primary);
+    transform: translateX(10px);
+}
+
+.social-link-large .reveal-base {
+    flex-shrink: 0;
+}
+
+.social-link-large .reveal-extra {
+    max-width: 0;
+    opacity: 0;
+    white-space: nowrap;
+    transition: max-width 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s ease;
+    display: inline-block;
+    font-family: monospace;
+    font-size: 1.1rem; /* Slightly smaller, matches tech details */
+    color: var(--text-muted);
+    text-transform: lowercase;
+    flex-shrink: 0;
+}
+
+.social-link-large:hover .reveal-extra {
+    max-width: 450px;
+    opacity: 1;
+}
+
+/* Form Styling */
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-label {
+    font-size: 0.9rem;
+    color: var(--color-gray-500);
+    font-weight: 300;
+}
+
+.form-input {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--color-gray-700);
+    padding: 0.5rem 0;
+    font-family: var(--font-main);
+    font-size: 1rem;
+    font-weight: 300;
+    color: var(--text-primary);
+    transition: border-color 0.3s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-bottom-color: var(--text-primary);
+}
+
+textarea.form-input {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.btn-submit {
+    margin-top: 1rem;
+    padding: 1.25rem 2rem;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--text-primary);
+    font-family: var(--font-main);
+    font-weight: 400;
+    /* Standard button weight */
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    transition: all 0.2s ease;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    background: var(--text-primary);
+    color: var(--bg-primary);
+}
+
+.btn-submit.error {
+    animation: btn-shake 0.4s ease-in-out;
+    border-color: var(--color-gray-500) !important;
+    background: transparent !important;
+    color: var(--color-gray-500) !important;
+}
+
+.btn-submit.success {
+    border-color: var(--text-primary) !important;
+    background: var(--text-primary) !important;
+    color: var(--bg-primary) !important;
+}
+
+.btn-submit.loading {
+    cursor: wait;
+    opacity: 0.8;
+}
+
+@keyframes btn-shake {
+    0%, 100% { transform: translateX(0); }
+    15%, 45%, 75% { transform: translateX(-6px); }
+    30%, 60%, 90% { transform: translateX(6px); }
+}
+
+.btn-submit .arrow {
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+}
+
+.btn-submit:hover .arrow {
+    transform: translateX(5px);
+}
+
+.btn-submit.error .arrow,
+.btn-submit.success .arrow,
+.btn-submit.loading .arrow {
+    display: none;
+}
+
+/* ===== Contact Section ===== */
+
+/* ===== Contact Section ===== */
+/* Social links now handle the layout */
+
+.social-links {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    /* allow wrapping on small screens */
+    justify-content: center;
+    /* center them since title is centered usually or left aligned? */
+}
+
+.social-link {
+    font-size: 0.85rem;
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-gray-500);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.social-link:hover {
+    color: var(--text-primary);
+}

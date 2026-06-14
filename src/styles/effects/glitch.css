@@ -1,0 +1,63 @@
+/* ===== Glitch Animations ===== */
+@keyframes glitch-skew {
+    0% {
+        transform: skew(0deg);
+    }
+
+    20% {
+        transform: skew(-2deg);
+    }
+
+    40% {
+        transform: skew(2deg);
+    }
+
+    60% {
+        transform: skew(-1deg);
+    }
+
+    80% {
+        transform: skew(1deg);
+    }
+
+    100% {
+        transform: skew(0deg);
+    }
+}
+
+@keyframes glitch-anim {
+    0% {
+        text-shadow: -2px 0 var(--glitch-1), 2px 0 var(--glitch-2);
+    }
+
+    25% {
+        text-shadow: 2px 0 var(--glitch-1), -2px 0 var(--glitch-2);
+    }
+
+    50% {
+        text-shadow: -1px 0 var(--glitch-1), 1px 0 var(--glitch-2);
+    }
+
+    100% {
+        text-shadow: 1px 0 var(--glitch-1), -1px 0 var(--glitch-2);
+    }
+}
+
+/* Elements that use both skew distortion and shadow glitch (safe elements) */
+.hero-title span:hover,
+.section-title:hover,
+.work-item:hover .work-name,
+.contact-email:hover,
+.social-link:hover {
+    animation: glitch-skew 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both,
+        glitch-anim 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
+    color: var(--text-primary);
+}
+
+/* Layout-sensitive or magnetic elements that only use shadow glitch (to avoid layout shifting/jitter and magnetic transform overrides) */
+.nav-link:hover,
+.nav-logo:hover,
+.btn:hover {
+    animation: glitch-anim 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
+    color: var(--text-primary);
+}

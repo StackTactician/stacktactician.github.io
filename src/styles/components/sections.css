@@ -1,0 +1,124 @@
+/* ===== Sections ===== */
+section {
+    position: relative;
+    z-index: 2;
+    transition: background-color 0.2s ease;
+}
+
+section:not(.hero) {
+    background: transparent;
+    pointer-events: none;
+    /* Let clicks pass through to 3D scene */
+}
+
+.section-content {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 6rem 4rem;
+    pointer-events: auto;
+    /* Re-enable clicks for content */
+
+    /* Glassmorphism */
+    background: rgba(10, 10, 10, 0.65);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    margin-bottom: 2rem;
+    /* Spacing between cards */
+}
+
+body.light-mode .section-content {
+    background: rgba(255, 255, 255, 0.65);
+    border-color: rgba(0, 0, 0, 0.08);
+}
+
+.section-number {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    transition: color 0.2s ease;
+}
+
+.section-title {
+    font-size: 3rem;
+    font-weight: 200;
+    letter-spacing: -0.02em;
+    margin-bottom: 2rem;
+    transition: color 0.2s ease;
+    cursor: default;
+}
+
+.section-text {
+    font-size: 1.1rem;
+    font-weight: 300;
+    line-height: 1.8;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin-bottom: 2rem;
+    transition: color 0.2s ease;
+}
+
+/* ===== Mobile Responsiveness for New Sections ===== */
+@media (max-width: 768px) {
+
+    /* Experience Section */
+    .experience-list {
+        padding-left: 1.5rem;
+        gap: 2rem;
+    }
+
+    .experience-item::before {
+        left: -1.5rem;
+        width: 8px;
+        height: 8px;
+        top: 6px;
+    }
+
+    .role-title {
+        font-size: 1.1rem;
+    }
+
+    .company-name {
+        font-size: 0.95rem;
+    }
+
+    .experience-description li {
+        font-size: 0.9rem;
+    }
+
+    /* LazyHooks / Project Detail Section */
+    .project-detail {
+        padding: 4rem 1.5rem;
+        /* Reduce padding */
+    }
+
+    .project-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .project-features {
+        grid-template-columns: 1fr;
+        /* Stack features */
+    }
+
+    .code-preview {
+        margin-top: 2rem;
+    }
+
+    .project-links {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+
+    .project-links .btn {
+        width: 100%;
+        text-align: center;
+    }
+}

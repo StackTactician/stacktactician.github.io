@@ -1,0 +1,20 @@
+/* Portfolio styles entrypoint. Keep import order stable to preserve cascade behavior. */
+@import './base/tokens.css';
+@import './components/background-logos.css';
+@import './components/loading.css';
+@import './components/canvas.css';
+@import './components/navigation.css';
+@import './effects/glitch.css';
+@import './components/hero.css';
+@import './components/terminal.css';
+@import './components/sections.css';
+@import './components/skills.css';
+@import './components/photo-deck.css';
+@import './components/work.css';
+@import './components/contact.css';
+@import './components/project-details.css';
+@import './base/global.css';
+@import './components/back-to-top.css';
+@import './components/mobile-menu.css';
+@import './components/experience.css';
+@import './effects/animations.css';

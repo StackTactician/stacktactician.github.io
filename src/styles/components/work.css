@@ -1,0 +1,38 @@
+/* ===== Work Section ===== */
+.work-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.work-item {
+    display: grid;
+    grid-template-columns: 100px 1fr 150px;
+    align-items: center;
+    gap: 2rem;
+    padding: 2rem 0;
+    border-bottom: 1px solid var(--color-gray-800);
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    /* Scroll Animation Init State */
+    opacity: 0;
+    transform: translateX(-30vw);
+    /* Slide in from far left */
+    transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), padding 0.3s ease, border-color 0.3s ease;
+    will-change: opacity, transform;
+}
+
+.work-item.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.work-item:hover {
+    padding-left: 1rem;
+    border-color: var(--color-gray-600);
+}
+
+.work-item:hover .work-name {
+    color: var(--text-primary);
+    transform: translateX(10px);
+}
