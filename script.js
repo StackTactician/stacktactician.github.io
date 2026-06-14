@@ -1457,50 +1457,58 @@ function initPhotoDeck() {
     if (!deck) return;
 
     const cards = deck.querySelectorAll('.photo-card');
+    const captions = document.querySelectorAll('.photo-caption');
 
-    // Toggle fanned class on click/touch for mobile devices
-    deck.addEventListener('click', (e) => {
-        if (window.innerWidth <= 868) {
-            const isFanned = deck.classList.contains('fanned');
+    const setActiveCard = (card) => {
+        cards.forEach(c => c.classList.remove('active'));
+        captions.forEach(cap => cap.classList.remove('active'));
+
+        if (card) {
+            card.classList.add('active');
+            deck.classList.add('fanned');
             
-            // If clicking deck and it's not fanned, fan it out
-            if (!isFanned) {
-                deck.classList.add('fanned');
-                e.stopPropagation();
+            // Activate corresponding caption
+            const index = Array.from(cards).indexOf(card);
+            const caption = document.getElementById(`caption-card-${index + 1}`);
+            if (caption) {
+                caption.classList.add('active');
             }
+        } else {
+            deck.classList.remove('fanned');
+        }
+    };
+
+    // Toggle fan state on clicking the deck container if it's not fanned yet
+    deck.addEventListener('click', (e) => {
+        const isFanned = deck.classList.contains('fanned');
+        if (!isFanned) {
+            deck.classList.add('fanned');
+            e.stopPropagation();
         }
     });
 
     cards.forEach(card => {
         card.addEventListener('click', (e) => {
-            if (window.innerWidth <= 868) {
-                // If it is fanned, toggle active state on the clicked card
-                if (deck.classList.contains('fanned')) {
-                    e.stopPropagation();
-                    const isActive = card.classList.contains('active');
-                    
-                    cards.forEach(c => c.classList.remove('active'));
-                    
-                    if (!isActive) {
-                        card.classList.add('active');
-                    } else {
-                        // Clicking an already active card collapses the deck
-                        deck.classList.remove('fanned');
-                    }
+            e.stopPropagation();
+            const isFanned = deck.classList.contains('fanned');
+            const isActive = card.classList.contains('active');
+            
+            if (!isFanned) {
+                setActiveCard(card);
+            } else {
+                if (isActive) {
+                    setActiveCard(null);
                 } else {
-                    // Fan the deck first if it wasn't fanned
-                    deck.classList.add('fanned');
-                    e.stopPropagation();
+                    setActiveCard(card);
                 }
             }
         });
     });
 
-    // Tap outside to collapse
+    // Tap/Click outside to collapse and unfocus
     document.addEventListener('click', (e) => {
         if (!deck.contains(e.target)) {
-            deck.classList.remove('fanned');
-            cards.forEach(c => c.classList.remove('active'));
+            setActiveCard(null);
         }
     });
 }

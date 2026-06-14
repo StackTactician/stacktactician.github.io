@@ -996,7 +996,7 @@ body.light-mode .skill-card:hover {
     justify-content: center;
     align-items: center;
     width: 100%;
-    height: 380px;
+    height: 410px;
     position: relative;
 }
 
@@ -1099,6 +1099,164 @@ body.light-mode .photo-card img {
     border-color: rgba(255, 255, 255, 0.3);
 }
 
+/* Dynamic Overlap Cascade (Shifting and raising z-index of non-active cards so they aren't completely buried) */
+/* 1. When Card 1 is hovered or active */
+.photo-deck:has(.photo-card:nth-child(1):hover) .photo-card:nth-child(2),
+.photo-deck:has(.photo-card:nth-child(1).active) .photo-card:nth-child(2) {
+    transform: translate(15px, -20px) rotate(4deg);
+    z-index: 5;
+}
+.photo-deck:has(.photo-card:nth-child(1):hover) .photo-card:nth-child(3),
+.photo-deck:has(.photo-card:nth-child(1).active) .photo-card:nth-child(3) {
+    transform: translate(115px, -10px) rotate(10deg);
+}
+
+/* 2. When Card 3 is hovered or active */
+.photo-deck:has(.photo-card:nth-child(3):hover) .photo-card:nth-child(2),
+.photo-deck:has(.photo-card:nth-child(3).active) .photo-card:nth-child(2) {
+    transform: translate(-15px, -20px) rotate(-4deg);
+    z-index: 5;
+}
+.photo-deck:has(.photo-card:nth-child(3):hover) .photo-card:nth-child(1),
+.photo-deck:has(.photo-card:nth-child(3).active) .photo-card:nth-child(1) {
+    transform: translate(-115px, -10px) rotate(-10deg);
+}
+
+/* 3. When Card 2 is hovered or active */
+.photo-deck:has(.photo-card:nth-child(2):hover) .photo-card:nth-child(1),
+.photo-deck:has(.photo-card:nth-child(2).active) .photo-card:nth-child(1) {
+    transform: translate(-120px, -10px) rotate(-10deg);
+}
+.photo-deck:has(.photo-card:nth-child(2):hover) .photo-card:nth-child(3),
+.photo-deck:has(.photo-card:nth-child(2).active) .photo-card:nth-child(3) {
+    transform: translate(120px, -10px) rotate(10deg);
+}
+
+/* ===== Photo Deck Captions & HUD Connector Lines ===== */
+.photo-captions-container {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 4;
+}
+
+.photo-caption {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.photo-caption.active {
+    opacity: 1;
+}
+
+.photo-caption .line-v {
+    position: absolute;
+    border-left: 1px dashed var(--text-muted);
+}
+
+.photo-caption .line-h {
+    position: absolute;
+    border-top: 1px solid var(--text-muted);
+}
+
+.photo-caption .line-tick {
+    position: absolute;
+    border-left: 1px solid var(--text-muted);
+}
+
+.photo-caption .line-node {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    background: var(--text-secondary);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.photo-caption .caption-text {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: monospace;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    letter-spacing: 0.05em;
+    background: var(--bg-primary);
+    padding: 3px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    white-space: nowrap;
+    text-transform: uppercase;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+body.light-mode .photo-caption .caption-text {
+    background: var(--color-white);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Desktop Positions for Lines & Text */
+#caption-card-1 .line-node {
+    left: calc(50% - 105px);
+    top: 315px;
+}
+#caption-card-1 .line-v {
+    left: calc(50% - 105px);
+    top: 315px;
+    height: 40px;
+}
+#caption-card-1 .line-h {
+    left: calc(50% - 105px);
+    top: 355px;
+    width: 105px;
+}
+#caption-card-1 .line-tick {
+    left: 50%;
+    top: 355px;
+    height: 20px;
+}
+#caption-card-1 .caption-text {
+    top: 375px;
+}
+
+#caption-card-2 .line-node {
+    left: 50%;
+    top: 305px;
+}
+#caption-card-2 .line-v {
+    left: 50%;
+    top: 305px;
+    height: 70px;
+}
+#caption-card-2 .caption-text {
+    top: 375px;
+}
+
+#caption-card-3 .line-node {
+    left: calc(50% + 105px);
+    top: 315px;
+}
+#caption-card-3 .line-v {
+    left: calc(50% + 105px);
+    top: 315px;
+    height: 40px;
+}
+#caption-card-3 .line-h {
+    left: 50%;
+    top: 355px;
+    width: 105px;
+}
+#caption-card-3 .line-tick {
+    left: 50%;
+    top: 355px;
+    height: 20px;
+}
+#caption-card-3 .caption-text {
+    top: 375px;
+}
+
 body.light-mode .photo-card:hover,
 body.light-mode .photo-deck.fanned .photo-card.active {
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 0 20px rgba(0, 0, 0, 0.1);
@@ -1129,7 +1287,7 @@ body.light-mode .photo-deck.fanned .photo-card.active {
 
 @media (max-width: 480px) {
     .about-media {
-        height: 300px;
+        height: 340px !important;
     }
     .photo-deck {
         width: 170px;
@@ -1158,6 +1316,101 @@ body.light-mode .photo-deck.fanned .photo-card.active {
     .photo-deck:hover .photo-card:nth-child(3):hover,
     .photo-deck.fanned .photo-card:nth-child(3).active {
         transform: translate(65px, -25px) scale(1.1) rotate(0deg) !important;
+    }
+
+    /* Mobile Overlap Cascade Shifts */
+    .photo-deck:has(.photo-card:nth-child(1):hover) .photo-card:nth-child(2),
+    .photo-deck:has(.photo-card:nth-child(1).active) .photo-card:nth-child(2) {
+        transform: translate(10px, -12px) rotate(3deg) !important;
+        z-index: 5;
+    }
+    .photo-deck:has(.photo-card:nth-child(1):hover) .photo-card:nth-child(3),
+    .photo-deck:has(.photo-card:nth-child(1).active) .photo-card:nth-child(3) {
+        transform: translate(75px, -5px) rotate(8deg) !important;
+    }
+
+    .photo-deck:has(.photo-card:nth-child(3):hover) .photo-card:nth-child(2),
+    .photo-deck:has(.photo-card:nth-child(3).active) .photo-card:nth-child(2) {
+        transform: translate(-10px, -12px) rotate(-3deg) !important;
+        z-index: 5;
+    }
+    .photo-deck:has(.photo-card:nth-child(3):hover) .photo-card:nth-child(1),
+    .photo-deck:has(.photo-card:nth-child(3).active) .photo-card:nth-child(1) {
+        transform: translate(-75px, -5px) rotate(-8deg) !important;
+    }
+
+    .photo-deck:has(.photo-card:nth-child(2):hover) .photo-card:nth-child(1),
+    .photo-deck:has(.photo-card:nth-child(2).active) .photo-card:nth-child(1) {
+        transform: translate(-75px, -5px) rotate(-8deg) !important;
+    }
+    .photo-deck:has(.photo-card:nth-child(2):hover) .photo-card:nth-child(3),
+    .photo-deck:has(.photo-card:nth-child(2).active) .photo-card:nth-child(3) {
+        transform: translate(75px, -5px) rotate(8deg) !important;
+    }
+
+    /* Mobile Captions Positions */
+    #caption-card-1 .line-node {
+        left: calc(50% - 65px);
+        top: 252px;
+    }
+    #caption-card-1 .line-v {
+        left: calc(50% - 65px);
+        top: 252px;
+        height: 25px;
+    }
+    #caption-card-1 .line-h {
+        left: calc(50% - 65px);
+        top: 277px;
+        width: 65px;
+    }
+    #caption-card-1 .line-tick {
+        left: 50%;
+        top: 277px;
+        height: 15px;
+    }
+    #caption-card-1 .caption-text {
+        top: 292px;
+    }
+
+    #caption-card-2 .line-node {
+        left: 50%;
+        top: 242px;
+    }
+    #caption-card-2 .line-v {
+        left: 50%;
+        top: 242px;
+        height: 50px;
+    }
+    #caption-card-2 .caption-text {
+        top: 292px;
+    }
+
+    #caption-card-3 .line-node {
+        left: calc(50% + 65px);
+        top: 252px;
+    }
+    #caption-card-3 .line-v {
+        left: calc(50% + 65px);
+        top: 252px;
+        height: 25px;
+    }
+    #caption-card-3 .line-h {
+        left: 50%;
+        top: 277px;
+        width: 65px;
+    }
+    #caption-card-3 .line-tick {
+        left: 50%;
+        top: 277px;
+        height: 15px;
+    }
+    #caption-card-3 .caption-text {
+        top: 292px;
+    }
+
+    .photo-caption .caption-text {
+        font-size: 0.68rem;
+        padding: 2px 8px;
     }
 }
 
