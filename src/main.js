@@ -17,6 +17,7 @@ import { initScrollReveal } from './effects/scrollReveal.js';
 import { initCopyButtons } from './ui/copyButtons.js';
 import { initParallax } from './effects/parallax.js';
 import { initTextScramble } from './effects/TextScrambler.js';
+import { initToolsFolder } from './effects/toolsFolder.js';
 
 let scene3DInstance = null;
 
@@ -45,5 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
         initPhotoDeck();
         initParallax();
         initTextScramble();
+        initToolsFolder();
     });
 });
