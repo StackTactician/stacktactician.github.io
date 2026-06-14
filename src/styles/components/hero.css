@@ -1,0 +1,85 @@
+/* ===== Hero Section ===== */
+.hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 6rem 4rem;
+    z-index: 2;
+    background: transparent;
+    pointer-events: none;
+}
+
+.hero-content {
+    max-width: 800px;
+    pointer-events: auto;
+}
+
+.hero-subtitle {
+    font-size: 0.85rem;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-gray-400);
+    margin-bottom: 1.5rem;
+}
+
+.hero-title {
+    font-size: clamp(3rem, 10vw, 7rem);
+    font-weight: 200;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    margin-bottom: 2rem;
+}
+
+.hero-title span {
+    display: block;
+    cursor: default;
+    transition: all 0.2s ease;
+}
+
+.hero-title span:nth-child(2) {
+    font-weight: 600;
+}
+
+.btn {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    font-family: var(--font-main);
+    font-size: 0.85rem;
+    font-weight: 400;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--bg-primary);
+    background: var(--text-primary);
+    border: 1px solid var(--text-primary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    opacity: 1;
+    transform: translateY(-2px);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.hero-instruction {
+    position: absolute;
+    bottom: 3rem;
+    right: 4rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--color-gray-500);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.instruction-line {
+    width: 60px;
+    height: 1px;
+    background: var(--color-gray-600);
+}

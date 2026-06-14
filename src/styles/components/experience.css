@@ -1,0 +1,124 @@
+/* ===== Experience Section ===== */
+.experience-list {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+    position: relative;
+    padding-left: 2rem;
+    border-left: 1px solid var(--color-gray-800);
+}
+
+.experience-item {
+    position: relative;
+}
+
+.experience-item::before {
+    content: "";
+    position: absolute;
+    left: -2rem;
+    top: 5px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--color-gray-900);
+    border: 2px solid var(--color-gray-600);
+    transform: translateX(-50%);
+    transition: all 0.3s ease;
+}
+
+.experience-item:hover::before {
+    background: var(--text-primary);
+    border-color: var(--text-primary);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    transform: translateX(-50%) scale(1.4);
+}
+
+.experience-date {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.role-title {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+
+.company-name {
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.company-logo {
+    height: 1.2rem;
+    width: auto;
+    border-radius: 4px;
+    filter: invert(1);
+    transition: filter 0.3s ease;
+}
+
+.experience-description {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.experience-description li {
+    font-size: 0.95rem;
+    color: var(--color-gray-400);
+    margin-bottom: 0.5rem;
+    padding-left: 1.25rem;
+    position: relative;
+    line-height: 1.6;
+}
+
+.experience-description li::before {
+    content: "▹";
+    position: absolute;
+    left: 0;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    top: 2px;
+}
+
+/* Hover Effect */
+.experience-item:hover .role-title {
+    color: var(--color-white);
+}
+
+.experience-item:hover .experience-description li {
+    color: var(--text-secondary);
+}
+
+/* Light Mode Overrides */
+body.light-mode .experience-list {
+    border-left-color: var(--color-gray-300);
+}
+
+body.light-mode .experience-item::before {
+    background: var(--color-gray-100);
+    border-color: var(--color-gray-400);
+}
+
+body.light-mode .experience-item:hover::before {
+    background: var(--text-primary);
+    border-color: var(--text-primary);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+body.light-mode .experience-item:hover .role-title {
+    color: var(--color-black);
+}
+
+body.light-mode .company-logo {
+    filter: invert(0);
+}

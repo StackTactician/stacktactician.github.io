@@ -1,0 +1,53 @@
+/* ===== Light Mode Background Logos ===== */
+.bg-logos {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+/* Only show in light mode */
+body.light-mode .bg-logos {
+    opacity: 1;
+}
+
+.bg-logo {
+    position: absolute;
+    width: 8rem;
+    height: 8rem;
+    color: rgba(0, 0, 0, 0.04);
+    transition: color 0.3s ease;
+}
+
+.bg-logo svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* Slightly larger logos for some variety */
+.bg-logo:nth-child(2),
+.bg-logo:nth-child(5),
+.bg-logo:nth-child(9) {
+    width: 10rem;
+    height: 10rem;
+}
+
+.bg-logo:nth-child(4),
+.bg-logo:nth-child(7) {
+    width: 6rem;
+    height: 6rem;
+}
+
+.bg-logo:nth-child(11) {
+    width: 5rem;
+    height: 5rem;
+}
+
+/* Hide on mobile - too cramped */
+@media (max-width: 768px) {
+    .bg-logos {
+        display: none;
+    }
+}

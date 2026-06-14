@@ -1,0 +1,102 @@
+/* ===== Loading Screen ===== */
+.loading-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 10000000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-primary);
+    transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), visibility 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.loading-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#loadingLogoContainer {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    max-width: 80vw;
+    max-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 50%;
+    background: var(--text-primary);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    
+    /* Transition container as a unit */
+    opacity: 0;
+    filter: blur(6px);
+    transform: scale(0.8);
+    transition: opacity 1.2s cubic-bezier(0.25, 1, 0.5, 1),
+                filter 1.2s cubic-bezier(0.25, 1, 0.5, 1),
+                transform 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+#loadingLogoContainer svg {
+    width: 70%;
+    height: 70%;
+    display: block;
+}
+
+.loading-logo-path {
+    fill: var(--bg-primary);
+}
+
+.loading-screen.active #loadingLogoContainer {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1);
+}
+
+/* Shimmer Overlay */
+.shimmer-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+        135deg,
+        transparent 35%,
+        rgba(0, 0, 0, 0.28) 50%,
+        transparent 65%
+    );
+    transform: translateX(-100%);
+    z-index: 2;
+}
+
+/* Light mode overlay adjustment */
+body.light-mode .shimmer-overlay {
+    background: linear-gradient(
+        135deg,
+        transparent 35%,
+        rgba(255, 255, 255, 0.4) 50%,
+        transparent 65%
+    );
+}
+
+.loading-screen.shimmering .shimmer-overlay {
+    animation: shimmerSweep 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes shimmerSweep {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}

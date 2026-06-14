@@ -1,0 +1,126 @@
+/* ===== CSS Variables - Black/White/Gray Only ===== */
+:root {
+    --color-black: #000000;
+    --color-dark: #0a0a0a;
+    --color-gray-900: #111111;
+    --color-gray-800: #1a1a1a;
+    --color-gray-700: #2a2a2a;
+    --color-gray-600: #3a3a3a;
+    --color-gray-500: #666666;
+    --color-gray-400: #888888;
+    --color-gray-300: #aaaaaa;
+    --color-gray-200: #cccccc;
+    --color-gray-100: #e5e5e5;
+    --color-white: #ffffff;
+
+    --font-main: 'Outfit', sans-serif;
+
+    /* Theme colors (will be inverted in light mode) */
+    --bg-primary: var(--color-dark);
+    --bg-secondary: var(--color-black);
+    --text-primary: var(--color-white);
+    --text-secondary: var(--color-gray-400);
+    --text-muted: var(--color-gray-600);
+    --border-color: var(--color-gray-800);
+    --grid-dot-color: rgba(255, 255, 255, 0.035);
+
+    /* Glitch Colors (Monochrome) */
+    --glitch-1: var(--color-gray-500);
+    --glitch-2: var(--color-white);
+}
+
+/* Light mode overrides */
+/* Light mode overrides */
+body.light-mode {
+    --bg-primary: #e4e4e7;
+    /* Slightly darker/grayer than #f4f4f5 to reduce glare */
+    --bg-secondary: var(--color-gray-100);
+    --text-primary: var(--color-black);
+    --text-secondary: var(--color-gray-600);
+    --text-muted: var(--color-gray-400);
+    --border-color: var(--color-gray-200);
+    --grid-dot-color: rgba(0, 0, 0, 0.02);
+
+    --glitch-1: var(--color-gray-400);
+    --glitch-2: var(--color-gray-800);
+    /* Darker for visibility on light bg */
+}
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* Sleek Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--color-gray-700);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-gray-500);
+}
+
+body.light-mode ::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+}
+
+body.light-mode ::-webkit-scrollbar-thumb {
+    background: var(--color-gray-300);
+}
+
+body.light-mode ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-gray-400);
+}
+
+body, a, button, h1, h2, h3, h4, h5, h6, p, span, div, li, img, svg {
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: var(--font-main);
+    background-color: var(--bg-primary);
+    background-image: radial-gradient(var(--grid-dot-color) 1px, transparent 1px);
+    background-size: 24px 24px;
+    color: var(--text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Ensure form fields are editable and highlightable */
+input, textarea {
+    user-select: text !important;
+    -webkit-user-select: text !important;
+}
+
+/* Custom text selection highlighting */
+::selection {
+    background: var(--text-primary);
+    color: var(--bg-primary);
+}
+
+::-moz-selection {
+    background: var(--text-primary);
+    color: var(--bg-primary);
+}
