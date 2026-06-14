@@ -76,11 +76,20 @@ class Scene3D {
         const positions = new Float32Array(particleCount * 3);
         const sizes = new Float32Array(particleCount);
 
+        this.particleVelocities = [];
+
         for (let i = 0; i < particleCount; i++) {
             positions[i * 3] = (Math.random() - 0.5) * 20;
             positions[i * 3 + 1] = (Math.random() - 0.5) * 20;
             positions[i * 3 + 2] = (Math.random() - 0.5) * 20;
             sizes[i] = Math.random() * 0.05; // Very small
+
+            // Slow drift velocity
+            this.particleVelocities.push(new THREE.Vector3(
+                (Math.random() - 0.5) * 0.008,
+                (Math.random() - 0.5) * 0.008,
+                (Math.random() - 0.5) * 0.008
+            ));
         }
 
         geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
@@ -96,6 +105,22 @@ class Scene3D {
 
         this.particles = new THREE.Points(geometry, material);
         this.scene.add(this.particles);
+
+        // --- Create Constellation Lines ---
+        const maxConnections = particleCount * 4; // Max connections capacity
+        const lineGeometry = new THREE.BufferGeometry();
+        const linePositions = new Float32Array(maxConnections * 2 * 3); // 2 points per line, 3 coords per point
+        lineGeometry.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
+
+        this.lineMaterial = new THREE.LineBasicMaterial({
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.07, // Very faint, subtle neural network lines
+            depthWrite: false
+        });
+
+        this.constellationLines = new THREE.LineSegments(lineGeometry, this.lineMaterial);
+        this.scene.add(this.constellationLines);
     }
 
     createBackgroundLogos() {
@@ -552,6 +577,7 @@ class Scene3D {
             // Constant background movement + scroll influence
             this.particles.rotation.y += 0.002;
             this.particles.rotation.x = scrollOffset * 0.2; // Match main cube axis
+            this.updateParticlesAndLines();
         }
 
         // Light mode transition
@@ -569,6 +595,12 @@ class Scene3D {
             this.particles.material.color.setRGB(particleColor, particleColor, particleColor);
         }
 
+        if (this.lineMaterial) {
+            const lineColor = 1 - this.globalInvert;
+            this.lineMaterial.color.setRGB(lineColor, lineColor, lineColor);
+            this.lineMaterial.opacity = 0.07 * (1 - this.globalInvert) + 0.04 * this.globalInvert;
+        }
+
         // Background Logos Animation
         if (this.bgLogos && this.bgLogos.length > 0) {
             const targetLogoOpacity = this.globalInvert * 0.05; // Max opacity 0.05 when in light mode
@@ -581,6 +613,141 @@ class Scene3D {
 
         this.updateHoverTransitions();
         this.renderer.render(this.scene, this.camera);
+    }
+
+    updateParticlesAndLines() {
+        if (!this.particles || !this.particles.geometry) return;
+        const positions = this.particles.geometry.attributes.position.array;
+        const particleCount = positions.length / 3;
+
+        // Project mouse coordinates to 3D z = 0 plane
+        if (this.camera && this.mouse) {
+            const vector = new THREE.Vector3(this.mouse.x, this.mouse.y, 0.5);
+            vector.unproject(this.camera);
+            const dir = vector.sub(this.camera.position).normalize();
+            // Project onto z = 0 plane
+            const distance = -this.camera.position.z / dir.z;
+            this.mouse3D = this.camera.position.clone().add(dir.multiplyScalar(distance));
+        }
+
+        // 1. Update positions by velocity
+        for (let i = 0; i < particleCount; i++) {
+            // Apply mouse gravity (pull towards the projected mouse 3D position)
+            if (this.mouse3D) {
+                const px = positions[i * 3];
+                const py = positions[i * 3 + 1];
+                const pz = positions[i * 3 + 2];
+
+                const dx = this.mouse3D.x - px;
+                const dy = this.mouse3D.y - py;
+                const dz = this.mouse3D.z - pz; // pull towards z = 0 plane of the mouse projection
+
+                const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+                if (dist < 4.5 && dist > 1.0) {
+                    // Pull force: much gentler (multiplier 0.00008 instead of 0.0003)
+                    const force = (4.5 - dist) * 0.00008;
+                    this.particleVelocities[i].x += (dx / dist) * force;
+                    this.particleVelocities[i].y += (dy / dist) * force;
+                    this.particleVelocities[i].z += (dz / dist) * force;
+                } else if (dist <= 1.0 && dist > 0.1) {
+                    // Repel force if too close (under 1.0 units) to prevent crowding directly on cursor
+                    const force = (1.0 - dist) * 0.002;
+                    this.particleVelocities[i].x -= (dx / dist) * force;
+                    this.particleVelocities[i].y -= (dy / dist) * force;
+                    this.particleVelocities[i].z -= (dz / dist) * force;
+                }
+            }
+
+            // Apply friction/damping to prevent velocity buildup (damping 0.92 is slightly stronger than 0.95)
+            this.particleVelocities[i].multiplyScalar(0.92);
+
+            // Add a tiny bit of random jitter so they keep drifting naturally
+            this.particleVelocities[i].x += (Math.random() - 0.5) * 0.0008;
+            this.particleVelocities[i].y += (Math.random() - 0.5) * 0.0008;
+            this.particleVelocities[i].z += (Math.random() - 0.5) * 0.0008;
+
+            // Clamp velocity to a reasonable speed range (max speed 0.025 instead of 0.04)
+            const speed = this.particleVelocities[i].length();
+            const maxSpeed = 0.025;
+            const minSpeed = 0.0015;
+            if (speed > maxSpeed) {
+                this.particleVelocities[i].setLength(maxSpeed);
+            } else if (speed < minSpeed) {
+                this.particleVelocities[i].setLength(minSpeed);
+            }
+
+            positions[i * 3] += this.particleVelocities[i].x;
+            positions[i * 3 + 1] += this.particleVelocities[i].y;
+            positions[i * 3 + 2] += this.particleVelocities[i].z;
+
+            // Boundary checks: wrap around a box of size 20 (from -10 to 10)
+            const limit = 10;
+            if (positions[i * 3] > limit) {
+                positions[i * 3] = -limit;
+            } else if (positions[i * 3] < -limit) {
+                positions[i * 3] = limit;
+            }
+
+            if (positions[i * 3 + 1] > limit) {
+                positions[i * 3 + 1] = -limit;
+            } else if (positions[i * 3 + 1] < -limit) {
+                positions[i * 3 + 1] = limit;
+            }
+
+            if (positions[i * 3 + 2] > limit) {
+                positions[i * 3 + 2] = -limit;
+            } else if (positions[i * 3 + 2] < -limit) {
+                positions[i * 3 + 2] = limit;
+            }
+        }
+
+        this.particles.geometry.attributes.position.needsUpdate = true;
+
+        // 2. Build lines between particles close to each other
+        if (this.constellationLines) {
+            const linePositions = this.constellationLines.geometry.attributes.position.array;
+            let lineIndex = 0;
+            const maxConnections = linePositions.length / 3; // Max vertices
+            const maxDistance = 3.0; // Distance threshold for drawing a line
+
+            for (let i = 0; i < particleCount; i++) {
+                const px = positions[i * 3];
+                const py = positions[i * 3 + 1];
+                const pz = positions[i * 3 + 2];
+
+                for (let j = i + 1; j < particleCount; j++) {
+                    const qx = positions[j * 3];
+                    const qy = positions[j * 3 + 1];
+                    const qz = positions[j * 3 + 2];
+
+                    // Quick bounding box check first for performance
+                    const dx = px - qx;
+                    const dy = py - qy;
+                    const dz = pz - qz;
+
+                    if (Math.abs(dx) < maxDistance && Math.abs(dy) < maxDistance && Math.abs(dz) < maxDistance) {
+                        const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+                        if (dist < maxDistance) {
+                            if (lineIndex + 6 <= maxConnections) {
+                                // Add segment endpoints (particle i and particle j)
+                                linePositions[lineIndex++] = px;
+                                linePositions[lineIndex++] = py;
+                                linePositions[lineIndex++] = pz;
+
+                                linePositions[lineIndex++] = qx;
+                                linePositions[lineIndex++] = qy;
+                                linePositions[lineIndex++] = qz;
+                            } else {
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            this.constellationLines.geometry.attributes.position.needsUpdate = true;
+            this.constellationLines.geometry.setDrawRange(0, lineIndex / 3);
+        }
     }
 
     updateHoverTransitions() {
@@ -742,22 +909,81 @@ function initThemeToggle() {
 // ============================================
 function simulateLoading(callback) {
     const loadingScreen = document.getElementById('loadingScreen');
-    const progressBar = document.getElementById('loadingProgress');
+    const container = document.getElementById('loadingLogoContainer');
 
-    let progress = 0;
-    const interval = setInterval(() => {
-        progress += Math.random() * 15;
-        if (progress > 100) progress = 100;
-        if (progressBar) progressBar.style.width = progress + '%';
+    if (!container || !loadingScreen) {
+        if (loadingScreen) loadingScreen.classList.add('hidden');
+        if (callback) callback();
+        return;
+    }
 
-        if (progress >= 100) {
-            clearInterval(interval);
+    const fallback = () => {
+        loadingScreen.classList.add('hidden');
+        if (callback) callback();
+    };
+
+    fetch('assets/profile.svg')
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to load logo SVG');
+            return response.text();
+        })
+        .then(svgText => {
+            container.innerHTML = svgText;
+            const svg = container.querySelector('svg');
+            const path = container.querySelector('path');
+
+            if (!svg || !path) {
+                throw new Error('SVG or path element not found');
+            }
+
+            // Strip the outer square path of the SVG to leave only the negative space logo
+            const originalD = path.getAttribute('d');
+            if (originalD) {
+                const secondMIndex = originalD.indexOf(' M');
+                if (secondMIndex !== -1) {
+                    path.setAttribute('d', originalD.substring(secondMIndex).trim());
+                }
+            }
+
+            // Remove inline styling attributes to let CSS control them
+            path.removeAttribute('fill');
+            path.removeAttribute('stroke');
+            path.removeAttribute('style');
+            path.classList.add('loading-logo-path');
+
+            // Force SVG to scale nicely inside container
+            svg.setAttribute('width', '100%');
+            svg.setAttribute('height', '100%');
+            svg.classList.add('loading-logo-svg');
+
+            // Inject the shimmer overlay element
+            const shimmer = document.createElement('div');
+            shimmer.className = 'shimmer-overlay';
+            container.appendChild(shimmer);
+
+            // Force layout reflow
+            svg.getBoundingClientRect();
+
+            // Step 1: Fade in and focus logo
             setTimeout(() => {
-                if (loadingScreen) loadingScreen.classList.add('hidden');
+                loadingScreen.classList.add('active');
+            }, 50);
+
+            // Step 2: Trigger shimmer sweep after logo is fully focused
+            setTimeout(() => {
+                loadingScreen.classList.add('shimmering');
+            }, 1300);
+
+            // Step 3: Fade out preloader and initialize the page scripts
+            setTimeout(() => {
+                loadingScreen.classList.add('hidden');
                 if (callback) callback();
-            }, 300);
-        }
-    }, 100);
+            }, 2500);
+        })
+        .catch(err => {
+            console.warn('SVG Preloader Error:', err);
+            fallback();
+        });
 }
 
 // ============================================
@@ -767,11 +993,25 @@ function initBackToTop() {
     const backToTopBtn = document.getElementById('backToTop');
     if (!backToTopBtn) return;
 
+    const progressCircle = backToTopBtn.querySelector('.progress-ring-circle');
+    const circumference = 2 * Math.PI * 22; // 138.23
+
     window.addEventListener('scroll', () => {
+        // Toggle visibility class
         if (window.scrollY > 500) {
             backToTopBtn.classList.add('visible');
         } else {
             backToTopBtn.classList.remove('visible');
+        }
+
+        // Calculate scroll progress percentage
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        
+        if (docHeight > 0 && progressCircle) {
+            const scrollPercent = Math.min(Math.max(scrollTop / docHeight, 0), 1);
+            const offset = circumference - (scrollPercent * circumference);
+            progressCircle.style.strokeDashoffset = offset.toFixed(2);
         }
     });
 
@@ -921,21 +1161,134 @@ function initTerminal() {
         }
     });
 
-    // Focus terminal when clicking on it
-    document.getElementById('terminal')?.addEventListener('click', (e) => {
-        // Don't focus if clicking minimize button
-        if (e.target.closest('.terminal-minimize')) return;
-        input.focus();
-    });
-
     // Minimize/restore toggle
     const terminal = document.getElementById('terminal');
     const minimizeBtn = document.getElementById('terminalMinimize');
+    const header = document.getElementById('terminalHeader');
+
+    let ignoreNextClick = false;
+
     if (minimizeBtn && terminal) {
-        minimizeBtn.addEventListener('click', () => {
+        minimizeBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Stop click from bubbling up to the terminal container
+            if (ignoreNextClick) {
+                ignoreNextClick = false;
+                return;
+            }
             terminal.classList.toggle('minimized');
             minimizeBtn.innerHTML = terminal.classList.contains('minimized') ? '&gt;_' : '−';
         });
+    }
+
+    // Focus terminal when clicking on it, or restore if minimized
+    terminal?.addEventListener('click', (e) => {
+        if (ignoreNextClick) {
+            ignoreNextClick = false;
+            return;
+        }
+        if (terminal.classList.contains('minimized')) {
+            terminal.classList.remove('minimized');
+            if (minimizeBtn) minimizeBtn.innerHTML = '−';
+            setTimeout(() => input.focus(), 150);
+        } else {
+            if (e.target.closest('.terminal-minimize')) return;
+            input.focus();
+        }
+    });
+
+    // Make terminal draggable via header
+    if (terminal && header) {
+        let isDragging = false;
+        let startX, startY;
+        let initialLeft, initialTop;
+        let terminalWidth, terminalHeight;
+        let hasMoved = false;
+
+        const onStart = (e) => {
+            if (e.type === 'mousedown' && e.button !== 0) return;
+
+            const clientX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+
+            // Don't drag if clicking minimize button unless minimized
+            if (!terminal.classList.contains('minimized') && e.target.closest('.terminal-minimize')) {
+                return;
+            }
+
+            isDragging = true;
+            hasMoved = false;
+            startX = clientX;
+            startY = clientY;
+
+            const rect = terminal.getBoundingClientRect();
+            initialLeft = rect.left;
+            initialTop = rect.top;
+            terminalWidth = rect.width;
+            terminalHeight = rect.height;
+
+            terminal.style.bottom = 'auto';
+            terminal.style.right = 'auto';
+            terminal.style.left = `${initialLeft}px`;
+            terminal.style.top = `${initialTop}px`;
+            terminal.classList.add('dragging');
+
+            if (e.type === 'mousedown') {
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onEnd);
+            } else {
+                document.addEventListener('touchmove', onMove, { passive: false });
+                document.addEventListener('touchend', onEnd);
+            }
+        };
+
+        const onMove = (e) => {
+            if (!isDragging) return;
+            if (e.type === 'touchmove') e.preventDefault();
+
+            const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+
+            const dx = clientX - startX;
+            const dy = clientY - startY;
+
+            if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
+                hasMoved = true;
+            }
+
+            let newLeft = initialLeft + dx;
+            let newTop = initialTop + dy;
+
+            const minLeft = 0;
+            const maxLeft = window.innerWidth - terminalWidth;
+            const minTop = 0;
+            const maxTop = window.innerHeight - terminalHeight;
+
+            newLeft = Math.max(minLeft, Math.min(newLeft, maxLeft));
+            newTop = Math.max(minTop, Math.min(newTop, maxTop));
+
+            terminal.style.left = `${newLeft}px`;
+            terminal.style.top = `${newTop}px`;
+        };
+
+        const onEnd = () => {
+            isDragging = false;
+            terminal.classList.remove('dragging');
+
+            document.removeEventListener('mousemove', onMove);
+            document.removeEventListener('mouseup', onEnd);
+            document.removeEventListener('touchmove', onMove);
+            document.removeEventListener('touchend', onEnd);
+
+            if (hasMoved) {
+                ignoreNextClick = true;
+                setTimeout(() => {
+                    ignoreNextClick = false;
+                }, 50);
+            }
+        };
+
+        header.addEventListener('mousedown', onStart);
+        header.addEventListener('touchstart', onStart, { passive: true });
     }
 }
 
@@ -1010,17 +1363,21 @@ function initContactForm() {
 // Initialize
 // ============================================
 document.addEventListener('DOMContentLoaded', () => {
+    initThemeToggle();
     simulateLoading(() => {
         scene3DInstance = new Scene3D();
+        initSmoothScroll();
+        initScrollAnimations();
+        initNavigationScroll();
+        initBackToTop();
+        initMobileMenu();
+        initTerminal();
+        initContactForm();
+        initSpotlightGlow();
+        initMagneticElements();
+        initNavPill();
+        initScrollReveal();
     });
-    initSmoothScroll();
-    initScrollAnimations();
-    initNavigationScroll();
-    initBackToTop();
-    initThemeToggle();
-    initMobileMenu();
-    initTerminal();
-    initContactForm();
 });
 
 // ============================================
@@ -1035,3 +1392,264 @@ function toggleWorkItem(headerElement) {
 
 // Make it globally accessible
 window.toggleWorkItem = toggleWorkItem;
+
+// ============================================
+// Radial Spotlight Glow Effect
+// ============================================
+function initSpotlightGlow() {
+    const cards = document.querySelectorAll('.work-item-wrapper');
+    cards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            card.style.setProperty('--mouse-x', `${x}px`);
+            card.style.setProperty('--mouse-y', `${y}px`);
+        });
+    });
+}
+
+// ============================================
+// Magnetic Hover Effect
+// ============================================
+function initMagneticElements() {
+    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) return;
+
+    const selectors = [
+        '.social-link-large',
+        '.btn',
+        '.btn-outline',
+        '.btn-submit',
+        '.theme-toggle',
+        '.terminal-minimize',
+        '.back-to-top'
+    ];
+
+    const elements = document.querySelectorAll(selectors.join(', '));
+    const threshold = 100; // 100px activation radius
+    const magneticData = [];
+
+    // Cache stable layout center coordinates of each element on the page
+    function cacheCoordinates() {
+        elements.forEach((el, index) => {
+            let data = magneticData[index];
+            if (!data) {
+                data = {
+                    element: el,
+                    pageX: 0,
+                    pageY: 0,
+                    x: 0,
+                    y: 0,
+                    vx: 0,
+                    vy: 0,
+                    targetX: 0,
+                    targetY: 0,
+                    animating: false
+                };
+                magneticData[index] = data;
+            }
+
+            // Only reset style if the element is currently displaced by animation
+            const isOffset = data.x !== 0 || data.y !== 0;
+            let prevTransform, prevTransition;
+            
+            if (isOffset) {
+                prevTransform = el.style.transform;
+                prevTransition = el.style.transition;
+                el.style.transform = 'none';
+                el.style.transition = 'none';
+            }
+            
+            const rect = el.getBoundingClientRect();
+            data.pageX = rect.left + window.scrollX + rect.width / 2;
+            data.pageY = rect.top + window.scrollY + rect.height / 2;
+            
+            if (isOffset) {
+                el.style.transform = prevTransform;
+                el.style.transition = prevTransition;
+            }
+        });
+    }
+
+    cacheCoordinates();
+    window.addEventListener('resize', cacheCoordinates);
+    window.addEventListener('scroll', cacheCoordinates, { passive: true });
+
+    // Spring solver parameters
+    const stiffness = 120;
+    const damping = 8;
+    const mass = 0.8;
+
+    let isLoopActive = false;
+    let lastTime = performance.now();
+
+    function updateSprings(now) {
+        let dt = (now - lastTime) / 1000;
+        lastTime = now;
+
+        // Clamp dt to prevent layout jumps in background tabs
+        if (dt > 0.1) dt = 0.1;
+        if (dt < 0.001) dt = 0.001;
+
+        let activeCount = 0;
+
+        magneticData.forEach(data => {
+            if (!data.animating) return;
+
+            // Euler-Cromer integration for spring mass solver
+            const ax = (-stiffness * (data.x - data.targetX) - damping * data.vx) / mass;
+            const ay = (-stiffness * (data.y - data.targetY) - damping * data.vy) / mass;
+
+            data.vx += ax * dt;
+            data.vy += ay * dt;
+
+            data.x += data.vx * dt;
+            data.y += data.vy * dt;
+
+            // Apply displacement using GPU composited translate3d
+            data.element.style.transform = `translate3d(${data.x.toFixed(2)}px, ${data.y.toFixed(2)}px, 0)`;
+
+            // Check if element has settled
+            const isSettlingX = Math.abs(data.vx) < 0.05 && Math.abs(data.x - data.targetX) < 0.05;
+            const isSettlingY = Math.abs(data.vy) < 0.05 && Math.abs(data.y - data.targetY) < 0.05;
+
+            if (isSettlingX && isSettlingY) {
+                data.x = data.targetX;
+                data.y = data.targetY;
+                data.vx = 0;
+                data.vy = 0;
+                
+                if (data.targetX === 0 && data.targetY === 0) {
+                    data.element.style.transform = '';
+                } else {
+                    data.element.style.transform = `translate3d(${data.targetX.toFixed(2)}px, ${data.targetY.toFixed(2)}px, 0)`;
+                }
+                data.element.style.transition = ''; // Restore default CSS transitions
+                data.animating = false;
+            } else {
+                activeCount++;
+            }
+        });
+
+        if (activeCount > 0) {
+            requestAnimationFrame(updateSprings);
+        } else {
+            isLoopActive = false;
+        }
+    }
+
+    document.addEventListener('mousemove', (e) => {
+        const mx = e.clientX;
+        const my = e.clientY;
+        let needsActivation = false;
+
+        magneticData.forEach(data => {
+            const cx = data.pageX - window.scrollX;
+            const cy = data.pageY - window.scrollY;
+
+            const dx = mx - cx;
+            const dy = my - cy;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < threshold) {
+                const pullPower = (threshold - dist) / threshold; // 0 to 1
+                data.targetX = dx * 0.35 * pullPower;
+                data.targetY = dy * 0.35 * pullPower;
+            } else {
+                data.targetX = 0;
+                data.targetY = 0;
+            }
+
+            // If coordinates change, activate physics updates
+            if (data.targetX !== data.x || data.targetY !== data.y) {
+                data.animating = true;
+                data.element.style.transition = 'none'; // Temporarily bypass CSS transitions
+                needsActivation = true;
+            }
+        });
+
+        if (needsActivation && !isLoopActive) {
+            isLoopActive = true;
+            lastTime = performance.now();
+            requestAnimationFrame(updateSprings);
+        }
+    });
+}
+
+// ============================================
+// Shared Layout Nav Pill
+// ============================================
+function initNavPill() {
+    const navLinks = document.querySelector('.nav-links');
+    const pill = document.querySelector('.nav-pill');
+    if (!navLinks || !pill) return;
+
+    const links = navLinks.querySelectorAll('.nav-link');
+    let leaveTimeout = null;
+
+    const movePillTo = (link) => {
+        const containerRect = navLinks.getBoundingClientRect();
+        const linkRect = link.getBoundingClientRect();
+
+        const paddingX = 14;
+        const x = linkRect.left - containerRect.left - paddingX;
+        const w = linkRect.width + paddingX * 2;
+
+        pill.style.width = `${w}px`;
+        // translateY(-50%) is set in CSS; here we only offset X
+        pill.style.transform = `translate(${x}px, -50%)`;
+        pill.classList.add('active');
+    };
+
+    links.forEach(link => {
+        link.addEventListener('mouseenter', () => {
+            clearTimeout(leaveTimeout);
+            movePillTo(link);
+        });
+    });
+
+    navLinks.addEventListener('mouseleave', () => {
+        leaveTimeout = setTimeout(() => {
+            pill.classList.remove('active');
+        }, 120);
+    });
+}
+
+// ============================================
+// Scroll-Triggered Section Entrances
+// ============================================
+function initScrollReveal() {
+    // Targets to animate on scroll
+    const targets = [
+        '.work-item-wrapper',
+        '.experience-item',
+        '.section-number',
+        '.section-title',
+        '.section-text',
+        '.subsection',
+        '.contact-links',
+        '.contact-info'
+    ];
+
+    const elements = document.querySelectorAll(targets.join(', '));
+    elements.forEach(el => el.classList.add('scroll-reveal'));
+
+    // Stagger siblings within list containers
+    const groups = document.querySelectorAll('.work-list, .experience-list');
+    groups.forEach(group => group.classList.add('scroll-reveal-group'));
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                // Once animated in, stop observing to save resources
+                observer.unobserve(entry.target);
+            }
+        });
+    }, {
+        threshold: 0.12,
+        rootMargin: '0px 0px -40px 0px'
+    });
+
+    elements.forEach(el => observer.observe(el));
+}
