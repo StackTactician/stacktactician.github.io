@@ -36,7 +36,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@200;300;400;500;600;700&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=38">
+    <link rel="stylesheet" href="styles.css?v=54">
 
     <!-- JSON-LD -->
     <script type="application/ld+json">
@@ -243,7 +243,9 @@
         <div class="section-content">
             <span class="section-number">01</span>
             <h2 class="section-title">About</h2>
-            <p class="section-text">
+            <div class="about-layout">
+                <div class="about-info">
+                    <p class="section-text">
                 Hello, I'm Mubarak.
                 <br>
                 I'm a backend engineer and cybersecurity researcher, specializing in OffSec.
@@ -328,6 +330,22 @@
                     </a>
                 </div>
             </div>
+            </div> <!-- End about-info -->
+            
+            <div class="about-media">
+                <div class="photo-deck">
+                    <div class="photo-card">
+                        <img src="personal photo (1).webp" alt="Mubarak - Professional Headshot" loading="lazy">
+                    </div>
+                    <div class="photo-card">
+                        <img src="personal photo (2).webp" alt="Mubarak - Minecraft Art Style" loading="lazy">
+                    </div>
+                    <div class="photo-card">
+                        <img src="personal photo.webp" alt="Mubarak - Hacker Atmosphere" loading="lazy">
+                    </div>
+                </div>
+            </div>
+            </div> <!-- End about-layout -->
         </div>
     </section>
 
@@ -727,16 +745,47 @@ fn main() {
                     <h2 class="contact-title">LET'S TALK</h2>
 
                     <div class="contact-social-large">
-                        <a href="mailto:mmmoyosore09@gmail.com" class="social-link-large">E-MAIL</a>
-                        <a href="https://github.com/StackTactician" target="_blank" rel="noopener noreferrer"
-                            class="social-link-large">GITHUB</a>
-                        <a href="https://www.linkedin.com/in/mubarak-mustapha-75b4b6300/" target="_blank"
-                            rel="noopener noreferrer" class="social-link-large">LINKEDIN</a>
+                        <div class="social-copy-wrapper">
+                            <a href="mailto:mmmoyosore09@gmail.com" class="social-link-large">E-MAIL</a>
+                            <button class="copy-btn" data-copy="mmmoyosore09@gmail.com" aria-label="Copy email address" type="button">
+                                <svg class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                                <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12" class="checkmark-path"></polyline>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="social-copy-wrapper">
+                            <a href="https://github.com/StackTactician" target="_blank" rel="noopener noreferrer" class="social-link-large">GITHUB</a>
+                            <button class="copy-btn" data-copy="https://github.com/StackTactician" aria-label="Copy GitHub profile link" type="button">
+                                <svg class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                                <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12" class="checkmark-path"></polyline>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="social-copy-wrapper">
+                            <a href="https://www.linkedin.com/in/mubarak-mustapha-75b4b6300/" target="_blank" rel="noopener noreferrer" class="social-link-large">LINKEDIN</a>
+                            <button class="copy-btn" data-copy="https://www.linkedin.com/in/mubarak-mustapha-75b4b6300/" aria-label="Copy LinkedIn profile link" type="button">
+                                <svg class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                                <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12" class="checkmark-path"></polyline>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
                 <div class="contact-right">
-                    <form class="contact-form" id="contactForm" action="https://formspree.io/f/xrelbojw" method="POST">
+                    <form class="contact-form" id="contactForm" action="https://formspree.io/f/xrelbojw" method="POST" novalidate>
                         <div class="form-group">
                             <label for="name" class="form-label">Your Name</label>
                             <input type="text" id="name" name="name" class="form-input" required>
@@ -775,14 +824,14 @@ fn main() {
     </script>
     <!-- Back to Top Button -->
     <button id="backToTop" class="back-to-top" aria-label="Back to top">
-        <svg class="progress-ring" width="50" height="50">
+        <svg class="progress-ring" viewBox="0 0 50 50">
             <circle class="progress-ring-track" stroke="var(--bg-primary)" stroke-width="2" fill="transparent" r="22" cx="25" cy="25"/>
             <circle class="progress-ring-circle" stroke="var(--bg-primary)" stroke-width="2" fill="transparent" r="22" cx="25" cy="25"/>
         </svg>
         <span class="back-to-top-arrow">↑</span>
     </button>
 
-    <script type="module" src="script.js?v=38"></script>
+    <script type="module" src="script.js?v=54"></script>
 </body>
 
 </html>

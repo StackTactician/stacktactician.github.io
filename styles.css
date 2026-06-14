@@ -252,21 +252,21 @@ body.light-mode .bg-logos {
     pointer-events: none;
     background: linear-gradient(
         135deg,
-        transparent 30%,
-        rgba(255, 255, 255, 0.25) 50%,
-        transparent 70%
+        transparent 35%,
+        rgba(0, 0, 0, 0.28) 50%,
+        transparent 65%
     );
     transform: translateX(-100%);
     z-index: 2;
 }
 
 /* Light mode overlay adjustment */
-.light-mode .shimmer-overlay {
+body.light-mode .shimmer-overlay {
     background: linear-gradient(
         135deg,
-        transparent 30%,
-        rgba(0, 0, 0, 0.12) 50%,
-        transparent 70%
+        transparent 35%,
+        rgba(255, 255, 255, 0.4) 50%,
+        transparent 65%
     );
 }
 
@@ -483,18 +483,23 @@ body.light-mode .nav-logo-text {
     }
 }
 
-.nav-link:hover,
-.nav-logo:hover,
+/* Elements that use both skew distortion and shadow glitch (safe elements) */
 .hero-title span:hover,
 .section-title:hover,
 .work-item:hover .work-name,
 .contact-email:hover,
-.social-link:hover,
-.btn:hover {
+.social-link:hover {
     animation: glitch-skew 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both,
         glitch-anim 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
     color: var(--text-primary);
-    /* Ensure contrast is kept */
+}
+
+/* Layout-sensitive or magnetic elements that only use shadow glitch (to avoid layout shifting/jitter and magnetic transform overrides) */
+.nav-link:hover,
+.nav-logo:hover,
+.btn:hover {
+    animation: glitch-anim 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
+    color: var(--text-primary);
 }
 
 /* ===== Hero Section ===== */
@@ -973,6 +978,189 @@ body.light-mode .skill-card:hover {
     line-height: 1.5;
 }
 
+/* ===== Fan-Out Photo Deck ===== */
+.about-layout {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 4rem;
+    align-items: center;
+}
+
+.about-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.about-media {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 380px;
+    position: relative;
+}
+
+.photo-deck {
+    position: relative;
+    width: 220px;
+    height: 290px;
+    cursor: pointer;
+}
+
+.photo-card {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    background: rgba(15, 15, 15, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), 
+                box-shadow 0.3s ease, 
+                border-color 0.3s ease;
+    transform-origin: bottom center;
+    will-change: transform;
+}
+
+.photo-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(40%) contrast(110%);
+    transition: filter 0.3s ease, transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Light mode overrides */
+body.light-mode .photo-card {
+    background: rgba(245, 245, 245, 0.85);
+    border-color: rgba(0, 0, 0, 0.12);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+body.light-mode .photo-card img {
+    filter: grayscale(20%) contrast(105%);
+}
+
+/* Stacked Positions (Default State) */
+.photo-card:nth-child(1) {
+    transform: rotate(-6deg) translate(-8px, 4px);
+    z-index: 1;
+}
+
+.photo-card:nth-child(2) {
+    transform: rotate(3deg) translate(4px, -2px);
+    z-index: 2;
+}
+
+.photo-card:nth-child(3) {
+    transform: rotate(-2deg) translate(0, 0);
+    z-index: 3;
+}
+
+/* Fan Out on Hover or Active class for Mobile */
+.photo-deck:hover .photo-card:nth-child(1),
+.photo-deck.fanned .photo-card:nth-child(1) {
+    transform: translate(-105px, -15px) rotate(-14deg);
+}
+
+.photo-deck:hover .photo-card:nth-child(2),
+.photo-deck.fanned .photo-card:nth-child(2) {
+    transform: translate(0, -25px) rotate(0deg);
+}
+
+.photo-deck:hover .photo-card:nth-child(3),
+.photo-deck.fanned .photo-card:nth-child(3) {
+    transform: translate(105px, -15px) rotate(14deg);
+}
+
+/* Individual Card Hover/Active when fanned */
+.photo-deck:hover .photo-card:nth-child(1):hover,
+.photo-deck.fanned .photo-card:nth-child(1).active {
+    z-index: 10 !important;
+    transform: translate(-105px, -35px) scale(1.1) rotate(0deg) !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 20px rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.photo-deck:hover .photo-card:nth-child(2):hover,
+.photo-deck.fanned .photo-card:nth-child(2).active {
+    z-index: 10 !important;
+    transform: translate(0, -45px) scale(1.1) rotate(0deg) !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 20px rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.photo-deck:hover .photo-card:nth-child(3):hover,
+.photo-deck.fanned .photo-card:nth-child(3).active {
+    z-index: 10 !important;
+    transform: translate(105px, -35px) scale(1.1) rotate(0deg) !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 20px rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+body.light-mode .photo-card:hover,
+body.light-mode .photo-deck.fanned .photo-card.active {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 0 20px rgba(0, 0, 0, 0.1);
+    border-color: rgba(0, 0, 0, 0.25);
+}
+
+.photo-deck:hover .photo-card:hover img,
+.photo-deck.fanned .photo-card.active img {
+    filter: grayscale(0%) contrast(100%);
+    transform: scale(1.05);
+}
+
+/* Responsiveness */
+@media (max-width: 868px) {
+    .about-layout {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+        justify-items: center;
+        text-align: center;
+    }
+    .about-info {
+        align-items: center;
+    }
+    .skills {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .about-media {
+        height: 300px;
+    }
+    .photo-deck {
+        width: 170px;
+        height: 225px;
+    }
+    .photo-deck:hover .photo-card:nth-child(1),
+    .photo-deck.fanned .photo-card:nth-child(1) {
+        transform: translate(-65px, -10px) rotate(-10deg);
+    }
+    .photo-deck:hover .photo-card:nth-child(2),
+    .photo-deck.fanned .photo-card:nth-child(2) {
+        transform: translate(0, -15px) rotate(0deg);
+    }
+    .photo-deck:hover .photo-card:nth-child(3),
+    .photo-deck.fanned .photo-card:nth-child(3) {
+        transform: translate(65px, -10px) rotate(10deg);
+    }
+    .photo-deck:hover .photo-card:nth-child(1):hover,
+    .photo-deck.fanned .photo-card:nth-child(1).active {
+        transform: translate(-65px, -25px) scale(1.1) rotate(0deg) !important;
+    }
+    .photo-deck:hover .photo-card:nth-child(2):hover,
+    .photo-deck.fanned .photo-card:nth-child(2).active {
+        transform: translate(0, -30px) scale(1.1) rotate(0deg) !important;
+    }
+    .photo-deck:hover .photo-card:nth-child(3):hover,
+    .photo-deck.fanned .photo-card:nth-child(3).active {
+        transform: translate(65px, -25px) scale(1.1) rotate(0deg) !important;
+    }
+}
+
 /* ===== Work Section ===== */
 .work-list {
     display: flex;
@@ -1136,6 +1324,30 @@ textarea.form-input {
     color: var(--bg-primary);
 }
 
+.btn-submit.error {
+    animation: btn-shake 0.4s ease-in-out;
+    border-color: var(--color-gray-500) !important;
+    background: transparent !important;
+    color: var(--color-gray-500) !important;
+}
+
+.btn-submit.success {
+    border-color: var(--text-primary) !important;
+    background: var(--text-primary) !important;
+    color: var(--bg-primary) !important;
+}
+
+.btn-submit.loading {
+    cursor: wait;
+    opacity: 0.8;
+}
+
+@keyframes btn-shake {
+    0%, 100% { transform: translateX(0); }
+    15%, 45%, 75% { transform: translateX(-6px); }
+    30%, 60%, 90% { transform: translateX(6px); }
+}
+
 .btn-submit .arrow {
     font-size: 1.2rem;
     transition: transform 0.3s ease;
@@ -1143,6 +1355,12 @@ textarea.form-input {
 
 .btn-submit:hover .arrow {
     transform: translateX(5px);
+}
+
+.btn-submit.error .arrow,
+.btn-submit.success .arrow,
+.btn-submit.loading .arrow {
+    display: none;
 }
 
 /* ===== Project Details Section ===== */
@@ -1793,7 +2011,7 @@ body.light-mode .company-logo {
 .work-item-wrapper {
     position: relative;
     padding: 0 1.5rem;
-    margin: 1.5rem 0;
+    margin: 0.75rem 0;
     border-radius: 12px;
     background: transparent;
     transition: padding 0.4s ease-out;
@@ -1835,13 +2053,13 @@ body.light-mode .company-logo {
     display: flex;
     align-items: center;
     gap: 2rem;
-    padding: 1.5rem 0;
+    padding: 0.85rem 0;
     cursor: pointer;
     transition: padding 0.4s ease-out;
 }
 
 .work-item-wrapper.expanded .work-item-header {
-    padding: 2rem 0;
+    padding: 1.25rem 0;
 }
 
 .work-year {
@@ -1994,3 +2212,78 @@ body.light-mode .company-logo {
     border-color: rgba(0, 0, 0, 0.1);
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
+
+/* ===== Copy Email Button & 3D Toasts (Phase 3) ===== */
+.social-copy-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.copy-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: var(--color-gray-500);
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.copy-btn:hover {
+    color: var(--text-primary);
+    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+body.light-mode .copy-btn {
+    border-color: rgba(0, 0, 0, 0.12);
+    color: var(--color-gray-500);
+}
+
+body.light-mode .copy-btn:hover {
+    color: var(--text-primary);
+    border-color: rgba(0, 0, 0, 0.25);
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.copy-btn svg {
+    width: 14px;
+    height: 14px;
+    position: absolute;
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease;
+}
+
+.copy-btn .check-icon {
+    opacity: 0;
+    transform: scale(0.5);
+}
+
+.checkmark-path {
+    stroke: var(--text-primary);
+    stroke-dasharray: 24;
+    stroke-dashoffset: 24;
+    transition: stroke-dashoffset 0.4s ease-in-out;
+}
+
+.copy-btn.copied .copy-icon {
+    opacity: 0;
+    transform: scale(0.5);
+}
+
+.copy-btn.copied .check-icon {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.copy-btn.copied .checkmark-path {
+    stroke-dashoffset: 0;
+}
+

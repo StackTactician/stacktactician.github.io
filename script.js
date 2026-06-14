@@ -857,6 +857,18 @@ function initNavigationScroll() {
         isHovering = e.clientY < 100;
         updateNav();
     });
+
+    // Logo click to scroll to top
+    const navLogo = document.querySelector('.nav-logo');
+    if (navLogo) {
+        navLogo.style.cursor = 'pointer';
+        navLogo.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    }
 }
 
 // ============================================
@@ -1304,8 +1316,35 @@ function initContactForm() {
 
             const btn = form.querySelector('.btn-submit');
             const btnText = btn.querySelector('.btn-text');
-            const arrow = btn.querySelector('.arrow');
             const originalText = btnText.textContent;
+
+            // Check custom validity
+            const nameInput = form.querySelector('#name');
+            const emailInput = form.querySelector('#email');
+            const messageInput = form.querySelector('#message');
+
+            let errorMsg = '';
+            if (!nameInput || !nameInput.value.trim()) {
+                errorMsg = 'PLEASE ENTER YOUR NAME';
+            } else if (!emailInput || !emailInput.value.trim()) {
+                errorMsg = 'PLEASE ENTER YOUR EMAIL';
+            } else if (emailInput && !emailInput.checkValidity()) {
+                errorMsg = 'PLEASE ENTER A VALID EMAIL';
+            } else if (!messageInput || !messageInput.value.trim()) {
+                errorMsg = 'PLEASE ENTER YOUR MESSAGE';
+            }
+
+            if (errorMsg) {
+                // Shake and show error text
+                btnText.textContent = errorMsg;
+                btn.classList.add('error');
+
+                setTimeout(() => {
+                    btnText.textContent = originalText;
+                    btn.classList.remove('error');
+                }, 3000);
+                return;
+            }
 
             // Set loading state
             btnText.textContent = 'SENDING...';
@@ -1336,23 +1375,20 @@ function initContactForm() {
                     }, 3000);
                 } else {
                     // Error
-                    const jsonData = await response.json();
-                    if (Object.hasOwn(jsonData, 'errors')) {
-                        btnText.textContent = jsonData["errors"].map(error => error["message"]).join(", ");
-                    } else {
-                        btnText.textContent = 'ERROR!';
-                    }
+                    btnText.textContent = 'SEND FAILED!';
+                    btn.classList.add('error');
 
                     setTimeout(() => {
                         btnText.textContent = originalText;
-                        btn.classList.remove('loading');
+                        btn.classList.remove('loading', 'error');
                     }, 3000);
                 }
             } catch (error) {
-                btnText.textContent = 'ERROR!';
+                btnText.textContent = 'NETWORK ERROR!';
+                btn.classList.add('error');
                 setTimeout(() => {
                     btnText.textContent = originalText;
-                    btn.classList.remove('loading');
+                    btn.classList.remove('loading', 'error');
                 }, 3000);
             }
         });
@@ -1377,6 +1413,10 @@ document.addEventListener('DOMContentLoaded', () => {
         initMagneticElements();
         initNavPill();
         initScrollReveal();
+        initCopyButtons();
+        initPhotoDeck();
+        initParallax();
+        initTextScramble();
     });
 });
 
@@ -1410,6 +1450,62 @@ function initSpotlightGlow() {
 }
 
 // ============================================
+// Fan-Out Photo Deck Interactions
+// ============================================
+function initPhotoDeck() {
+    const deck = document.querySelector('.photo-deck');
+    if (!deck) return;
+
+    const cards = deck.querySelectorAll('.photo-card');
+
+    // Toggle fanned class on click/touch for mobile devices
+    deck.addEventListener('click', (e) => {
+        if (window.innerWidth <= 868) {
+            const isFanned = deck.classList.contains('fanned');
+            
+            // If clicking deck and it's not fanned, fan it out
+            if (!isFanned) {
+                deck.classList.add('fanned');
+                e.stopPropagation();
+            }
+        }
+    });
+
+    cards.forEach(card => {
+        card.addEventListener('click', (e) => {
+            if (window.innerWidth <= 868) {
+                // If it is fanned, toggle active state on the clicked card
+                if (deck.classList.contains('fanned')) {
+                    e.stopPropagation();
+                    const isActive = card.classList.contains('active');
+                    
+                    cards.forEach(c => c.classList.remove('active'));
+                    
+                    if (!isActive) {
+                        card.classList.add('active');
+                    } else {
+                        // Clicking an already active card collapses the deck
+                        deck.classList.remove('fanned');
+                    }
+                } else {
+                    // Fan the deck first if it wasn't fanned
+                    deck.classList.add('fanned');
+                    e.stopPropagation();
+                }
+            }
+        });
+    });
+
+    // Tap outside to collapse
+    document.addEventListener('click', (e) => {
+        if (!deck.contains(e.target)) {
+            deck.classList.remove('fanned');
+            cards.forEach(c => c.classList.remove('active'));
+        }
+    });
+}
+
+// ============================================
 // Magnetic Hover Effect
 // ============================================
 function initMagneticElements() {
@@ -1422,7 +1518,8 @@ function initMagneticElements() {
         '.btn-submit',
         '.theme-toggle',
         '.terminal-minimize',
-        '.back-to-top'
+        '.back-to-top',
+        '.nav-logo'
     ];
 
     const elements = document.querySelectorAll(selectors.join(', '));
@@ -1652,4 +1749,228 @@ function initScrollReveal() {
     });
 
     elements.forEach(el => observer.observe(el));
+}
+
+// ============================================
+// Copy Social Links to Clipboard (Phase 3)
+// ============================================
+function initCopyButtons() {
+    const buttons = document.querySelectorAll('.copy-btn');
+    buttons.forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const textToCopy = btn.getAttribute('data-copy');
+            if (!textToCopy) return;
+
+            try {
+                await navigator.clipboard.writeText(textToCopy);
+                
+                // Trigger checkmark path-draw animation
+                btn.classList.add('copied');
+                
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                }, 3000);
+            } catch (err) {
+                console.error('Failed to copy to clipboard:', err);
+            }
+        });
+    });
+}
+
+// ============================================
+// Parallax Scroll Effect (Phase 4)
+// ============================================
+function initParallax() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const heroSubtitle = document.querySelector('.hero-subtitle');
+    const heroTitle = document.querySelector('.hero-title');
+    const heroCta = document.querySelector('.hero-cta');
+
+    const parallaxElements = [];
+
+    // Select elements that want parallax
+    const sections = document.querySelectorAll('section');
+    sections.forEach(section => {
+        const title = section.querySelector('.section-title');
+        if (title) {
+            parallaxElements.push({
+                element: title,
+                section: section,
+                speed: 0.08, // Subtle displacement speed (deeper background feel)
+                sectionTop: 0,
+                sectionHeight: 0
+            });
+        }
+        
+        const photoDeck = section.querySelector('.photo-deck');
+        if (photoDeck) {
+            parallaxElements.push({
+                element: photoDeck,
+                section: section,
+                speed: -0.06, // Subtle foreground speed (pops closer)
+                sectionTop: 0,
+                sectionHeight: 0
+            });
+        }
+    });
+
+    const updateOffsets = () => {
+        parallaxElements.forEach(item => {
+            const rect = item.section.getBoundingClientRect();
+            item.sectionTop = rect.top + window.scrollY;
+            item.sectionHeight = rect.height;
+        });
+    };
+
+    // Cache offsets initially and on window resize to prevent layout thrashing
+    updateOffsets();
+    window.addEventListener('resize', updateOffsets);
+
+    // Smooth scroll interpolation variables
+    let currentScrollY = window.scrollY;
+    let targetScrollY = window.scrollY;
+
+    window.addEventListener('scroll', () => {
+        targetScrollY = window.scrollY;
+    }, { passive: true });
+
+    function animateParallax() {
+        const diff = targetScrollY - currentScrollY;
+        
+        if (Math.abs(diff) > 0.05) {
+            // Smooth lerping with a slightly faster coefficient (0.12) to feel highly responsive yet buttery
+            currentScrollY += diff * 0.12;
+            
+            // 1. Hero elements parallax (only run when visible)
+            if (currentScrollY < window.innerHeight * 1.5) {
+                const s = currentScrollY;
+                if (heroSubtitle) {
+                    heroSubtitle.style.transform = `translateY(${s * 0.18}px) translateZ(0)`;
+                }
+                if (heroTitle) {
+                    heroTitle.style.transform = `translateY(${s * 0.08}px) translateZ(0)`;
+                }
+                if (heroCta) {
+                    heroCta.style.transform = `translateY(${s * 0.12}px) translateZ(0)`;
+                }
+            }
+
+            // 2. Sections parallax (titles & photo deck) using cached dimensions
+            const viewportBottom = currentScrollY + window.innerHeight;
+            parallaxElements.forEach(item => {
+                if (viewportBottom > item.sectionTop && currentScrollY < item.sectionTop + item.sectionHeight) {
+                    const scrolledOffset = currentScrollY - item.sectionTop;
+                    const val = scrolledOffset * item.speed;
+                    item.element.style.transform = `translateY(${val}px) translateZ(0)`;
+                }
+            });
+        } else if (currentScrollY !== targetScrollY) {
+            currentScrollY = targetScrollY;
+            
+            // Final snap position
+            if (currentScrollY < window.innerHeight * 1.5) {
+                const s = currentScrollY;
+                if (heroSubtitle) heroSubtitle.style.transform = `translateY(${s * 0.18}px) translateZ(0)`;
+                if (heroTitle) heroTitle.style.transform = `translateY(${s * 0.08}px) translateZ(0)`;
+                if (heroCta) heroCta.style.transform = `translateY(${s * 0.12}px) translateZ(0)`;
+            }
+            
+            const viewportBottom = currentScrollY + window.innerHeight;
+            parallaxElements.forEach(item => {
+                if (viewportBottom > item.sectionTop && currentScrollY < item.sectionTop + item.sectionHeight) {
+                    const scrolledOffset = currentScrollY - item.sectionTop;
+                    const val = scrolledOffset * item.speed;
+                    item.element.style.transform = `translateY(${val}px) translateZ(0)`;
+                }
+            });
+        }
+        
+        requestAnimationFrame(animateParallax);
+    }
+
+    animateParallax();
+}
+
+// ============================================
+// Scramble Text on Hover (Phase 5)
+// ============================================
+class TextScrambler {
+    constructor(element, triggerElement = null) {
+        this.element = element;
+        this.triggerElement = triggerElement || element;
+        this.originalText = element.textContent;
+        this.chars = '!@#$01_x*?[]{}<>-+=';
+        this.isAnimating = false;
+        this.frameRequest = null;
+
+        this.triggerElement.addEventListener('mouseenter', () => this.scramble());
+    }
+
+    scramble() {
+        if (this.isAnimating) {
+            cancelAnimationFrame(this.frameRequest);
+        }
+
+        this.isAnimating = true;
+        let frame = 0;
+        const totalFrames = 25; // Speed of resolving
+        const textLength = this.originalText.length;
+
+        const tick = () => {
+            let output = '';
+            let completeCount = 0;
+
+            for (let i = 0; i < textLength; i++) {
+                const threshold = (frame / totalFrames) * textLength;
+
+                if (this.originalText[i] === ' ') {
+                    output += ' ';
+                    if (i < threshold) completeCount++;
+                } else if (i < threshold) {
+                    output += this.originalText[i];
+                    completeCount++;
+                } else if (i < threshold + 3) {
+                    output += this.chars[Math.floor(Math.random() * this.chars.length)];
+                } else {
+                    output += this.chars[Math.floor(Math.random() * this.chars.length)];
+                }
+            }
+
+            this.element.textContent = output;
+
+            if (completeCount < textLength) {
+                frame++;
+                this.frameRequest = requestAnimationFrame(tick);
+            } else {
+                this.isAnimating = false;
+                this.element.textContent = this.originalText;
+            }
+        };
+
+        this.frameRequest = requestAnimationFrame(tick);
+    }
+}
+
+function initTextScramble() {
+    // Hero Title Spans
+    const heroSpans = document.querySelectorAll('.hero-title span');
+    heroSpans.forEach(span => new TextScrambler(span));
+
+    // Section Titles
+    const sectionTitles = document.querySelectorAll('.section-title');
+    sectionTitles.forEach(title => new TextScrambler(title));
+
+    // Work Item Names
+    const workItems = document.querySelectorAll('.work-item');
+    workItems.forEach(item => {
+        const name = item.querySelector('.work-name');
+        if (name) {
+            new TextScrambler(name, item);
+        }
+    });
+
+    // Buttons
+    const buttons = document.querySelectorAll('.btn');
+    buttons.forEach(btn => new TextScrambler(btn));
 }
