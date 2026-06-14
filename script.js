@@ -1417,6 +1417,7 @@ document.addEventListener('DOMContentLoaded', () => {
         initPhotoDeck();
         initParallax();
         initTextScramble();
+        initSkillsFolders();
     });
 });
 
@@ -1981,4 +1982,453 @@ function initTextScramble() {
     // Buttons
     const buttons = document.querySelectorAll('.btn');
     buttons.forEach(btn => new TextScrambler(btn));
+}
+
+// ============================================
+// iOS-style Skills Folders Flip Transition
+// ============================================
+function initSkillsFolders() {
+    const backdrop = document.getElementById('backdrop');
+    if (!backdrop) return;
+
+    const folders = document.querySelectorAll('.skills-folder');
+    let activeFolder = null;
+    let isAnimating = false;
+
+    folders.forEach(folder => {
+        folder.addEventListener('click', (e) => {
+            // If folder is already active, we clicked an icon inside it, or an animation is running
+            if (folder.classList.contains('active') || isAnimating) return;
+            
+            e.stopPropagation();
+            openFolder(folder);
+        });
+    });
+
+    // Close when clicking backdrop
+    backdrop.addEventListener('click', () => {
+        if (activeFolder && !isAnimating) {
+            closeFolder(activeFolder);
+        }
+    });
+
+    // Close when clicking outside the active folder (e.g. anywhere on document)
+    document.addEventListener('click', (e) => {
+        if (activeFolder && !isAnimating && !activeFolder.contains(e.target)) {
+            closeFolder(activeFolder);
+        }
+    });
+    const updateOffsets = () => {
+        parallaxElements.forEach(item => {
+            const rect = item.section.getBoundingClientRect();
+            item.sectionTop = rect.top + window.scrollY;
+            item.sectionHeight = rect.height;
+        });
+    };
+
+    // Cache offsets initially and on window resize to prevent layout thrashing
+    updateOffsets();
+    window.addEventListener('resize', updateOffsets);
+
+    // Smooth scroll interpolation variables
+    let currentScrollY = window.scrollY;
+    let targetScrollY = window.scrollY;
+
+    window.addEventListener('scroll', () => {
+        targetScrollY = window.scrollY;
+    }, { passive: true });
+
+    function animateParallax() {
+        const diff = targetScrollY - currentScrollY;
+        
+        if (Math.abs(diff) > 0.05) {
+            // Smooth lerping with a slightly faster coefficient (0.12) to feel highly responsive yet buttery
+            currentScrollY += diff * 0.12;
+            
+            // 1. Hero elements parallax (only run when visible)
+            if (currentScrollY < window.innerHeight * 1.5) {
+                const s = currentScrollY;
+                if (heroSubtitle) {
+                    heroSubtitle.style.transform = `translateY(${s * 0.18}px) translateZ(0)`;
+                }
+                if (heroTitle) {
+                    heroTitle.style.transform = `translateY(${s * 0.08}px) translateZ(0)`;
+                }
+                if (heroCta) {
+                    heroCta.style.transform = `translateY(${s * 0.12}px) translateZ(0)`;
+                }
+            }
+
+            // 2. Sections parallax (titles & photo deck) using cached dimensions
+            const viewportBottom = currentScrollY + window.innerHeight;
+            parallaxElements.forEach(item => {
+                if (viewportBottom > item.sectionTop && currentScrollY < item.sectionTop + item.sectionHeight) {
+                    const scrolledOffset = currentScrollY - item.sectionTop;
+                    const val = scrolledOffset * item.speed;
+                    item.element.style.transform = `translateY(${val}px) translateZ(0)`;
+                }
+            });
+        } else if (currentScrollY !== targetScrollY) {
+            currentScrollY = targetScrollY;
+            
+            // Final snap position
+            if (currentScrollY < window.innerHeight * 1.5) {
+                const s = currentScrollY;
+                if (heroSubtitle) heroSubtitle.style.transform = `translateY(${s * 0.18}px) translateZ(0)`;
+                if (heroTitle) heroTitle.style.transform = `translateY(${s * 0.08}px) translateZ(0)`;
+                if (heroCta) heroCta.style.transform = `translateY(${s * 0.12}px) translateZ(0)`;
+            }
+            
+            const viewportBottom = currentScrollY + window.innerHeight;
+            parallaxElements.forEach(item => {
+                if (viewportBottom > item.sectionTop && currentScrollY < item.sectionTop + item.sectionHeight) {
+                    const scrolledOffset = currentScrollY - item.sectionTop;
+                    const val = scrolledOffset * item.speed;
+                    item.element.style.transform = `translateY(${val}px) translateZ(0)`;
+                }
+            });
+        }
+        
+        requestAnimationFrame(animateParallax);
+    }
+
+    animateParallax();
+}
+
+// ============================================
+// Scramble Text on Hover (Phase 5)
+// ============================================
+class TextScrambler {
+    constructor(element, triggerElement = null) {
+        this.element = element;
+        this.triggerElement = triggerElement || element;
+        this.originalText = element.textContent;
+        this.chars = '!@#$01_x*?[]{}<>-+=';
+        this.isAnimating = false;
+        this.frameRequest = null;
+
+        this.triggerElement.addEventListener('mouseenter', () => this.scramble());
+    }
+
+    scramble() {
+        if (this.isAnimating) {
+            cancelAnimationFrame(this.frameRequest);
+        }
+
+        this.isAnimating = true;
+        let frame = 0;
+        const totalFrames = 25; // Speed of resolving
+        const textLength = this.originalText.length;
+
+        const tick = () => {
+            let output = '';
+            let completeCount = 0;
+
+            for (let i = 0; i < textLength; i++) {
+                const threshold = (frame / totalFrames) * textLength;
+
+                if (this.originalText[i] === ' ') {
+                    output += ' ';
+                    if (i < threshold) completeCount++;
+                } else if (i < threshold) {
+                    output += this.originalText[i];
+                    completeCount++;
+                } else if (i < threshold + 3) {
+                    output += this.chars[Math.floor(Math.random() * this.chars.length)];
+                } else {
+                    output += this.chars[Math.floor(Math.random() * this.chars.length)];
+                }
+            }
+
+            this.element.textContent = output;
+
+            if (completeCount < textLength) {
+                frame++;
+                this.frameRequest = requestAnimationFrame(tick);
+            } else {
+                this.isAnimating = false;
+                this.element.textContent = this.originalText;
+            }
+        };
+
+        this.frameRequest = requestAnimationFrame(tick);
+    }
+}
+
+function initTextScramble() {
+    // Hero Title Spans
+    const heroSpans = document.querySelectorAll('.hero-title span');
+    heroSpans.forEach(span => new TextScrambler(span));
+
+    // Section Titles
+    const sectionTitles = document.querySelectorAll('.section-title');
+    sectionTitles.forEach(title => new TextScrambler(title));
+
+    // Work Item Names
+    const workItems = document.querySelectorAll('.work-item');
+    workItems.forEach(item => {
+        const name = item.querySelector('.work-name');
+        if (name) {
+            new TextScrambler(name, item);
+        }
+    });
+
+    // Buttons
+    const buttons = document.querySelectorAll('.btn');
+    buttons.forEach(btn => new TextScrambler(btn));
+}
+
+// ============================================
+// iOS-style Skills Folders Flip Transition
+// ============================================
+function initSkillsFolders() {
+    const backdrop = document.getElementById('backdrop');
+    if (!backdrop) return;
+
+    const folders = document.querySelectorAll('.skills-folder');
+    let activeFolder = null;
+    let isAnimating = false;
+
+    folders.forEach(folder => {
+        folder.addEventListener('click', (e) => {
+            // If folder is already active, we clicked an icon inside it, or an animation is running
+            if (folder.classList.contains('active') || isAnimating) return;
+            
+            e.stopPropagation();
+            openFolder(folder);
+        });
+    });
+
+    // Close when clicking backdrop
+    backdrop.addEventListener('click', () => {
+        if (activeFolder && !isAnimating) {
+            closeFolder(activeFolder);
+        }
+    });
+
+    // Close when clicking outside the active folder (e.g. anywhere on document)
+    document.addEventListener('click', (e) => {
+        if (activeFolder && !isAnimating && !activeFolder.contains(e.target)) {
+            closeFolder(activeFolder);
+        }
+    });
+
+    // Handle Escape key to close active folder
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && activeFolder && !isAnimating) {
+            closeFolder(activeFolder);
+        }
+    });
+
+    function openFolder(folder) {
+        isAnimating = true;
+        activeFolder = folder;
+        const parent = folder.parentElement;
+        const icons = folder.querySelectorAll('.skills-app-icon');
+
+        // 1. FIRST: Get initial screen bounding rects
+        const firstFolderRect = folder.getBoundingClientRect();
+        const firstIconRects = Array.from(icons).map(icon => icon.getBoundingClientRect());
+
+        // Create placeholder to keep grid layout stable
+        const placeholder = document.createElement('div');
+        placeholder.className = 'skills-folder-placeholder';
+        placeholder.style.width = firstFolderRect.width + 'px';
+        placeholder.style.height = firstFolderRect.height + 'px';
+        placeholder.style.flexShrink = '0';
+        placeholder.style.pointerEvents = 'none';
+        parent.insertBefore(placeholder, folder);
+
+        // Move folder to body so it escapes stacking context
+        document.body.appendChild(folder);
+        
+        parent.classList.add('active-parent');
+        backdrop.classList.add('active');
+
+        // 2. STATE CHANGE: Shift element into active modal styles
+        folder.classList.add('active');
+
+        // 3. LAST: Get final screen bounding rects in the centered modal state
+        const lastFolderRect = folder.getBoundingClientRect();
+        const lastIconRects = Array.from(icons).map(icon => icon.getBoundingClientRect());
+
+        // 4. INVERT: Calculate offsets and scales based on element centers
+        const scale_p = firstFolderRect.width / lastFolderRect.width;
+        
+        const C_p_first = { 
+            x: firstFolderRect.left + firstFolderRect.width / 2, 
+            y: firstFolderRect.top + firstFolderRect.height / 2 
+        };
+        const C_p_last = { 
+            x: lastFolderRect.left + lastFolderRect.width / 2, 
+            y: lastFolderRect.top + lastFolderRect.height / 2 
+        };
+
+        const folderDeltaX = C_p_first.x - C_p_last.x;
+        const folderDeltaY = C_p_first.y - C_p_last.y;
+
+        // Apply parent invert transform instantly (no transition)
+        folder.style.transform = `translate(${folderDeltaX}px, ${folderDeltaY}px) scale(${scale_p})`;
+        folder.style.transition = 'none';
+
+        // Apply child icon invert transforms instantly (no transition)
+        icons.forEach((icon, i) => {
+            const firstRect = firstIconRects[i];
+            const lastRect = lastIconRects[i];
+
+            const C_c_first = { 
+                x: firstRect.left + firstRect.width / 2, 
+                y: firstRect.top + firstRect.height / 2 
+            };
+            const C_c_last = { 
+                x: lastRect.left + lastRect.width / 2, 
+                y: lastRect.top + lastRect.height / 2 
+            };
+
+            const scale_c_initial = firstRect.width / lastRect.width;
+            const scale_c = scale_c_initial / scale_p;
+
+            const translate_c_x = (C_c_first.x - C_p_first.x) / scale_p - (C_c_last.x - C_p_last.x);
+            const translate_c_y = (C_c_first.y - C_p_first.y) / scale_p - (C_c_last.y - C_p_last.y);
+
+            icon.style.transform = `translate(${translate_c_x}px, ${translate_c_y}px) scale(${scale_c})`;
+            icon.style.transition = 'none';
+        });
+
+        // Force browser layout recalculation/reflow
+        folder.offsetHeight;
+
+        // 5. PLAY: Animate back to identity (transform: none) using smooth Apple-inspired easing
+        const transitionStyle = 'transform 0.48s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.48s ease, border-radius 0.48s ease, box-shadow 0.48s ease';
+        folder.style.transition = transitionStyle;
+        folder.style.transform = '';
+
+        const iconTransitionStyle = 'transform 0.48s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease, border-radius 0.48s cubic-bezier(0.16, 1, 0.3, 1)';
+        icons.forEach(icon => {
+            icon.style.transition = iconTransitionStyle;
+            icon.style.transform = '';
+        });
+
+        const onTransitionEnd = (e) => {
+            if (e.target === folder && e.propertyName === 'transform') {
+                folder.style.transition = '';
+                folder.style.transform = '';
+                icons.forEach(icon => {
+                    icon.style.transition = '';
+                    icon.style.transform = '';
+                });
+                folder.removeEventListener('transitionend', onTransitionEnd);
+                isAnimating = false;
+            }
+        };
+        folder.addEventListener('transitionend', onTransitionEnd);
+    }
+
+    function closeFolder(folder) {
+        isAnimating = true;
+        const placeholder = document.querySelector('.skills-folder-placeholder');
+        if (!placeholder) {
+            isAnimating = false;
+            activeFolder = null;
+            return;
+        }
+        const originalParent = placeholder.parentElement;
+        const icons = folder.querySelectorAll('.skills-app-icon');
+
+        backdrop.classList.remove('active');
+        originalParent.classList.remove('active-parent');
+
+        // 1. FIRST: Get current bounds (centered modal state)
+        const firstFolderRect = folder.getBoundingClientRect();
+        const firstIconRects = Array.from(icons).map(icon => icon.getBoundingClientRect());
+
+        // 2. STATE CHANGE: Temporarily put folder back to grid slot to measure final positions
+        folder.classList.remove('active');
+        originalParent.insertBefore(folder, placeholder);
+
+        // 3. LAST: Get final target bounds in standard grid slot
+        const lastFolderRect = folder.getBoundingClientRect();
+        const lastIconRects = Array.from(icons).map(icon => icon.getBoundingClientRect());
+
+        // Now move it BACK to body so it stays on top of backdrop during animation
+        document.body.appendChild(folder);
+
+        // 4. INVERT: Calculate offsets based on element centers
+        const scale_p = firstFolderRect.width / lastFolderRect.width;
+        
+        const C_p_first = { 
+            x: firstFolderRect.left + firstFolderRect.width / 2, 
+            y: firstFolderRect.top + firstFolderRect.height / 2 
+        };
+        const C_p_last = { 
+            x: lastFolderRect.left + lastFolderRect.width / 2, 
+            y: lastFolderRect.top + lastFolderRect.height / 2 
+        };
+
+        const folderDeltaX = C_p_first.x - C_p_last.x;
+        const folderDeltaY = C_p_first.y - C_p_last.y;
+
+        // Apply parent invert transform instantly
+        folder.style.transform = `translate(${folderDeltaX}px, ${folderDeltaY}px) scale(${scale_p})`;
+        folder.style.transition = 'none';
+
+        // Apply child icon invert transforms instantly
+        icons.forEach((icon, i) => {
+            const firstRect = firstIconRects[i];
+            const lastRect = lastIconRects[i];
+
+            const C_c_first = { 
+                x: firstRect.left + firstRect.width / 2, 
+                y: firstRect.top + firstRect.height / 2 
+            };
+            const C_c_last = { 
+                x: lastRect.left + lastRect.width / 2, 
+                y: lastRect.top + lastRect.height / 2 
+            };
+
+            const scale_c_initial = firstRect.width / lastRect.width;
+            const scale_c = scale_c_initial / scale_p;
+
+            const translate_c_x = (C_c_first.x - C_p_first.x) / scale_p - (C_c_last.x - C_p_last.x);
+            const translate_c_y = (C_c_first.y - C_p_first.y) / scale_p - (C_c_last.y - C_p_last.y);
+
+            icon.style.transform = `translate(${translate_c_x}px, ${translate_c_y}px) scale(${scale_c})`;
+            icon.style.transition = 'none';
+        });
+
+        // Force layout reflow
+        folder.offsetHeight;
+
+        // 5. PLAY: Animate folder back to standard size/position
+        const transitionStyle = 'transform 0.48s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.48s ease, border-radius 0.48s ease, box-shadow 0.48s ease';
+        folder.style.transition = transitionStyle;
+        folder.style.transform = '';
+
+        const iconTransitionStyle = 'transform 0.48s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease, border-radius 0.48s cubic-bezier(0.16, 1, 0.3, 1)';
+        icons.forEach(icon => {
+            icon.style.transition = iconTransitionStyle;
+            icon.style.transform = '';
+        });
+
+        // Clean up transitions and permanently move it back when animation completes
+        const onTransitionEnd = (e) => {
+            if (e.target === folder && e.propertyName === 'transform') {
+                folder.style.transition = '';
+                folder.style.transform = '';
+                icons.forEach(icon => {
+                    icon.style.transition = '';
+                    icon.style.transform = '';
+                });
+
+                // Permanently put folder back into grid and remove placeholder
+                originalParent.insertBefore(folder, placeholder);
+                placeholder.remove();
+
+                folder.removeEventListener('transitionend', onTransitionEnd);
+                isAnimating = false;
+                activeFolder = null;
+            }
+        };
+        folder.addEventListener('transitionend', onTransitionEnd);
+    }
 }

@@ -840,18 +840,26 @@ section:not(.hero) {
     padding: 6rem 4rem;
     pointer-events: auto;
     /* Re-enable clicks for content */
+    position: relative;
+    margin-bottom: 2rem;
+    /* Spacing between cards */
+}
 
+.section-content::before {
+    content: '';
+    position: absolute;
+    inset: 0;
     /* Glassmorphism */
     background: rgba(10, 10, 10, 0.65);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 24px;
-    margin-bottom: 2rem;
-    /* Spacing between cards */
+    z-index: -1;
+    pointer-events: none;
 }
 
-body.light-mode .section-content {
+body.light-mode .section-content::before {
     background: rgba(255, 255, 255, 0.65);
     border-color: rgba(0, 0, 0, 0.08);
 }
@@ -911,6 +919,245 @@ body.light-mode .section-content {
 .skill:hover {
     color: var(--text-primary);
     transform: translateY(-3px);
+}
+
+/* ===== iOS-style Skills Folders Theme Tokens ===== */
+:root {
+    --folder-bg: rgba(255, 255, 255, 0.03);
+    --folder-border: rgba(255, 255, 255, 0.08);
+    --folder-hover-bg: rgba(255, 255, 255, 0.06);
+    --folder-hover-border: rgba(255, 255, 255, 0.2);
+    --folder-glow: rgba(255, 255, 255, 0.15);
+    
+    --folder-active-bg: rgba(10, 10, 10, 0.95);
+    --folder-active-border: rgba(255, 255, 255, 0.12);
+    --folder-active-shadow: rgba(0, 0, 0, 0.85);
+    
+    --app-icon-bg: rgba(255, 255, 255, 0.06);
+    --app-icon-border: rgba(255, 255, 255, 0.03);
+    
+    --app-icon-active-bg: rgba(255, 255, 255, 0.04);
+    --app-icon-active-border: rgba(255, 255, 255, 0.08);
+    --app-icon-hover-bg: rgba(255, 255, 255, 0.09);
+    --app-icon-hover-border: rgba(255, 255, 255, 0.2);
+    
+    --backdrop-bg: rgba(0, 0, 0, 0.75);
+}
+
+body.light-mode {
+    --folder-bg: rgba(0, 0, 0, 0.03);
+    --folder-border: rgba(0, 0, 0, 0.08);
+    --folder-hover-bg: rgba(0, 0, 0, 0.05);
+    --folder-hover-border: rgba(0, 0, 0, 0.2);
+    --folder-glow: rgba(0, 0, 0, 0.05);
+    
+    --folder-active-bg: rgba(245, 245, 245, 0.95);
+    --folder-active-border: rgba(0, 0, 0, 0.1);
+    --folder-active-shadow: rgba(0, 0, 0, 0.15);
+    
+    --app-icon-bg: rgba(0, 0, 0, 0.04);
+    --app-icon-border: rgba(0, 0, 0, 0.03);
+    
+    --app-icon-active-bg: rgba(0, 0, 0, 0.03);
+    --app-icon-active-border: rgba(0, 0, 0, 0.05);
+    --app-icon-hover-bg: rgba(0, 0, 0, 0.07);
+    --app-icon-hover-border: rgba(0, 0, 0, 0.15);
+    
+    --backdrop-bg: rgba(255, 255, 255, 0.75);
+}
+
+/* Backdrop Blur Overlay for Folders */
+.backdrop {
+    position: fixed;
+    inset: 0;
+    background: var(--backdrop-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 990;
+}
+
+.backdrop.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Folder Grid Container in Tools Section */
+.skills-folders-grid {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+}
+
+/* Folder Wrapper - Stable dimensions to avoid layout shifts */
+.skills-folder-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    width: 120px;
+    height: 150px;
+    position: relative;
+}
+
+/* Folder Card (Closed State) */
+.skills-folder {
+    width: 110px;
+    height: 110px;
+    background: var(--folder-bg);
+    border: 1px solid var(--folder-border);
+    border-radius: 26px;
+    padding: 12px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    transform-origin: center center;
+    z-index: 5;
+    transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.skills-folder-wrapper:hover .skills-folder {
+    border-color: var(--folder-hover-border);
+    background: var(--folder-hover-bg);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 15px var(--folder-glow);
+}
+
+/* Folder Mini Grid */
+.skills-folder-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+/* App Icon style inside folder */
+.skills-app-icon {
+    background: var(--app-icon-bg);
+    border: 1px solid var(--app-icon-border);
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 1;
+    position: relative;
+    transform-origin: center center;
+    box-sizing: border-box;
+    color: var(--color-gray-500); /* Keep it grey by default */
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.skills-app-icon svg {
+    width: 60%;
+    height: 60%;
+    color: currentColor;
+    display: block;
+}
+
+/* Disable clicks when closed so clicks trigger parent folder expansion */
+.skills-folder:not(.active) .skills-app-icon {
+    pointer-events: none;
+}
+
+/* App Label under Icon (Open State) */
+.skills-app-label {
+    position: absolute;
+    bottom: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    font-family: monospace;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Folder Title (Closed State) */
+.skills-folder-title {
+    margin-top: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    font-family: monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    transition: opacity 0.3s ease, color 0.3s ease;
+}
+
+.skills-folder-wrapper:hover .skills-folder-title {
+    color: var(--text-primary);
+}
+
+/* ============================================
+   ACTIVE (EXPANDED) FOLDER STATES
+   ============================================ */
+.skills-folder.active {
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    width: 320px;
+    height: 320px;
+    border-radius: 40px;
+    background: var(--folder-active-bg);
+    border-color: var(--folder-active-border);
+    box-shadow: 
+        0 30px 70px var(--folder-active-shadow), 
+        0 0 0 1px rgba(255, 255, 255, 0.05),
+        0 0 50px rgba(255, 255, 255, 0.02);
+    z-index: 1000;
+    cursor: default;
+    padding: 24px;
+}
+
+.skills-folder.active .skills-folder-grid {
+    grid-template-columns: repeat(2, 100px);
+    justify-content: center;
+    align-content: center;
+    gap: 32px;
+}
+
+/* Expanded icon size */
+.skills-folder.active .skills-app-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 20px;
+    background: var(--app-icon-active-bg);
+    border: 1px solid var(--app-icon-active-border);
+    color: var(--color-gray-500); /* Keep them grey by default inside folder */
+    cursor: pointer;
+}
+
+.skills-folder.active .skills-app-icon:hover {
+    background: var(--app-icon-hover-bg);
+    border-color: var(--app-icon-hover-border);
+    color: var(--text-primary); /* Turn white/primary on hover */
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
+}
+
+body.light-mode .skills-folder.active .skills-app-icon:hover {
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+}
+
+.skills-folder.active .skills-app-label {
+    opacity: 1;
+    transition-delay: 0.15s;
+}
+
+/* Hide folder label below folder when expanded */
+.skills-folder-wrapper.active-parent .skills-folder-title {
+    opacity: 0;
+    pointer-events: none;
 }
 
 /* ===== Skills Grid ===== */
