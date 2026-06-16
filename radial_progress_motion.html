@@ -1,0 +1,172 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  .scene {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    padding: 3rem 2rem;
+    min-height: 340px;
+  }
+  .ring-wrap {
+    position: relative;
+    width: 180px;
+    height: 180px;
+  }
+  .ring-svg {
+    width: 180px;
+    height: 180px;
+    transform: rotate(-90deg);
+  }
+  .track {
+    fill: none;
+    stroke: var(--color-background-secondary);
+    stroke-width: 12;
+  }
+  .indicator {
+    fill: none;
+    stroke: #6d68f8;
+    stroke-width: 12;
+    stroke-linecap: round;
+    will-change: stroke-dashoffset;
+  }
+  .center-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    pointer-events: none;
+  }
+  .center-value {
+    font-family: var(--font-sans);
+    font-size: 34px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .center-unit {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    line-height: 1;
+  }
+  .controls {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .btn {
+    padding: 7px 16px;
+    font-size: 13px;
+    font-family: var(--font-sans);
+    border-radius: var(--border-radius-md);
+    border: 0.5px solid var(--color-border-secondary);
+    background: var(--color-background-primary);
+    color: var(--color-text-primary);
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+  .btn:hover { background: var(--color-background-secondary); }
+  .btn.active {
+    background: #6d68f8;
+    color: #fff;
+    border-color: #6d68f8;
+  }
+</style>
+
+<div class="scene">
+  <h2 class="sr-only">Radial progress ring with animated stroke</h2>
+
+  <div class="ring-wrap">
+    <svg class="ring-svg" viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
+      <circle class="track" cx="90" cy="90" r="77"/>
+      <circle class="indicator" id="ring" cx="90" cy="90" r="77"/>
+    </svg>
+    <div class="center-label">
+      <span class="center-value" id="num">0</span>
+      <span class="center-unit">%</span>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn" onclick="go(0)">0%</button>
+    <button class="btn" onclick="go(25)">25%</button>
+    <button class="btn" onclick="go(50)">50%</button>
+    <button class="btn" onclick="go(75)">75%</button>
+    <button class="btn" onclick="go(100)">100%</button>
+    <button class="btn" id="btn-loop" onclick="startLoop()">Loop ↗</button>
+  </div>
+</div>
+
+<script>
+  const ring = document.getElementById('ring');
+  const numEl = document.getElementById('num');
+  const R = 77;
+  const CIRC = 2 * Math.PI * R;
+
+  ring.style.strokeDasharray = CIRC;
+  ring.style.strokeDashoffset = CIRC;
+
+  let current = 0;
+  let rafId = null;
+  let startT = null;
+  let fromVal = 0;
+  let toVal = 0;
+  const DUR = 900;
+
+  function ease(t) {
+    return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2;
+  }
+
+  function animTo(target, dur) {
+    if (rafId) cancelAnimationFrame(rafId);
+    fromVal = current;
+    toVal = target;
+    dur = dur ?? DUR;
+    startT = null;
+
+    function frame(ts) {
+      if (!startT) startT = ts;
+      const p = Math.min((ts - startT) / dur, 1);
+      const e = ease(p);
+      current = fromVal + (toVal - fromVal) * e;
+
+      const offset = CIRC - (current / 100) * CIRC;
+      ring.style.strokeDashoffset = offset;
+      numEl.textContent = Math.round(current);
+
+      if (p < 1) rafId = requestAnimationFrame(frame);
+      else { current = toVal; rafId = null; }
+    }
+    rafId = requestAnimationFrame(frame);
+  }
+
+  function go(v) { animTo(v); }
+
+  const steps = [0, 30, 65, 100, 80, 45, 0];
+  let si = 0;
+  let loopTimer = null;
+
+  function startLoop() {
+    if (loopTimer) { clearTimeout(loopTimer); loopTimer = null; }
+    si = 0;
+    document.getElementById('btn-loop').classList.add('active');
+    nextStep();
+  }
+
+  function nextStep() {
+    if (si >= steps.length) {
+      document.getElementById('btn-loop').classList.remove('active');
+      return;
+    }
+    animTo(steps[si++], 800);
+    loopTimer = setTimeout(nextStep, 1050);
+  }
+</script>

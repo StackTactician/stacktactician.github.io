@@ -1,0 +1,64 @@
+/* ===== Custom Cursor Base ===== */
+.custom-cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    /* Default dark mode styling (translucent white dot) */
+    background: rgba(255, 255, 255, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    pointer-events: none;
+    z-index: 99999;
+    transform: translate3d(-50%, -50%, 0);
+    opacity: 0;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    transition: 
+        width 0.25s cubic-bezier(0.16, 1, 0.3, 1), 
+        height 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+        border-radius 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+        background-color 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease,
+        opacity 0.2s ease;
+    will-change: transform, width, height, border-radius;
+}
+
+/* Light mode overrides (translucent dark dot) */
+body.light-mode .custom-cursor {
+    background: rgba(0, 0, 0, 0.35);
+    border-color: rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Hover state for other interactives (grows slightly) */
+.custom-cursor.cursor-hover {
+    width: 24px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+body.light-mode .custom-cursor.cursor-hover {
+    background: rgba(0, 0, 0, 0.15);
+    border-color: rgba(0, 0, 0, 0.3);
+}
+
+/* Pill state for header navigation links */
+.custom-cursor.cursor-pill {
+    border-radius: 99px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+body.light-mode .custom-cursor.cursor-pill {
+    background: rgba(0, 0, 0, 0.06);
+    border-color: rgba(0, 0, 0, 0.12);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+/* Hide standard browser cursor when custom cursor is active */
+body.custom-cursor-active,
+body.custom-cursor-active * {
+    cursor: none !important;
+}

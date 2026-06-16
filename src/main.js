@@ -12,12 +12,11 @@ import { initWorkAccordion } from './ui/workAccordion.js';
 import { initSpotlightGlow } from './effects/spotlightGlow.js';
 import { initPhotoDeck } from './effects/photoDeck.js';
 import { initMagneticElements } from './effects/magneticElements.js';
-import { initNavPill } from './effects/navPill.js';
+import { initCustomCursor } from './effects/customCursor.js';
 import { initScrollReveal } from './effects/scrollReveal.js';
 import { initCopyButtons } from './ui/copyButtons.js';
 import { initParallax } from './effects/parallax.js';
 import { initTextScramble } from './effects/TextScrambler.js';
-import { initToolsFolder } from './effects/toolsFolder.js';
 
 let scene3DInstance = null;
 
@@ -25,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initThemeToggle({
         getScene: () => scene3DInstance
     });
+    initCustomCursor();
 
     simulateLoading(() => {
         scene3DInstance = new Scene3D();
@@ -40,12 +40,10 @@ document.addEventListener('DOMContentLoaded', () => {
         initWorkAccordion();
         initSpotlightGlow();
         initMagneticElements();
-        initNavPill();
         initScrollReveal();
         initCopyButtons();
         initPhotoDeck();
         initParallax();
         initTextScramble();
-        initToolsFolder();
     });
 });

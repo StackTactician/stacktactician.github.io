@@ -101,9 +101,10 @@
         bottom: 1.5rem;
         right: 1.5rem;
         width: 40px !important;
-        height: 40px;
+        height: 40px !important;
         font-size: 1.2rem;
-        padding-left: 13.5px !important; /* Centers the 13px arrow in 40px width */
+        padding: 0 !important;
+        border-radius: 50% !important;
     }
 
     .back-to-top-text {
@@ -111,8 +112,8 @@
     }
 
     .back-to-top .progress-ring {
-        width: 40px !important;
-        height: 40px !important;
+        width: 100% !important;
+        height: 100% !important;
     }
 
     .social-link-large .reveal-extra {

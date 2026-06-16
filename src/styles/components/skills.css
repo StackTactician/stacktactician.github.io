@@ -1,8 +1,8 @@
 /* ===== Skills (Simple Icons) ===== */
 .skills {
     display: flex;
-    gap: 1.5rem;
     flex-wrap: wrap;
+    gap: 1.5rem;
     margin-top: 1.5rem;
 }
 
@@ -10,20 +10,29 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
-    color: var(--color-gray-500);
-    transition: color 0.3s ease, transform 0.3s ease;
+    width: 42px;
+    height: 42px;
+    color: var(--color-gray-400);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body.light-mode .skill {
+    color: var(--color-gray-600);
 }
 
 .skill svg {
     width: 100%;
     height: 100%;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .skill:hover {
     color: var(--text-primary);
     transform: translateY(-3px);
+}
+
+.skill:hover svg {
+    transform: scale(1.1);
 }
 
 /* ===== Skills Grid ===== */
@@ -89,166 +98,4 @@ body.light-mode .skill-card:hover {
     font-weight: 300;
     color: var(--text-secondary);
     line-height: 1.5;
-}
-
-/* ===== iOS-inspired Tools Folder ===== */
-.tools-folder {
-    --folder-size: clamp(150px, 40vw, 214px);
-    position: relative;
-    width: min(100%, 460px);
-    margin-top: 1.5rem;
-    isolation: isolate;
-}
-
-.tools-folder-cover {
-    --drag-x: 0px;
-    --drag-y: 0px;
-    --drag-scale-x: 1;
-    --drag-scale-y: 1;
-    position: relative;
-    z-index: 2;
-    display: grid;
-    gap: 0.9rem;
-    justify-items: center;
-    width: var(--folder-size);
-    min-height: var(--folder-size);
-    padding: 1rem;
-    color: var(--text-primary);
-    cursor: grab;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    border-radius: 34px;
-    background:
-        linear-gradient(145deg, rgba(255,255,255,0.18), rgba(255,255,255,0.04)),
-        rgba(22, 22, 24, 0.72);
-    box-shadow: 0 22px 65px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255,255,255,0.18);
-    backdrop-filter: blur(20px) saturate(1.35);
-    transform: translate3d(var(--drag-x), var(--drag-y), 0) scale(var(--drag-scale-x), var(--drag-scale-y));
-    transform-origin: 50% 70%;
-    transition: border-color 220ms ease, box-shadow 220ms ease, width 520ms var(--folder-ease, cubic-bezier(.16, 1.24, .34, 1)), min-height 520ms var(--folder-ease, cubic-bezier(.16, 1.24, .34, 1)), border-radius 520ms var(--folder-ease, cubic-bezier(.16, 1.24, .34, 1));
-}
-
-.tools-folder-cover:active { cursor: grabbing; }
-.tools-folder-cover.is-snapping { transition: transform 420ms cubic-bezier(.18, 1.55, .36, 1), border-color 220ms ease, box-shadow 220ms ease; }
-
-.tools-folder-cover:hover,
-.tools-folder-cover:focus-visible {
-    border-color: rgba(255, 255, 255, 0.34);
-    box-shadow: 0 28px 80px rgba(0, 0, 0, 0.42), 0 0 0 6px rgba(255,255,255,0.04), inset 0 1px 0 rgba(255,255,255,0.2);
-    outline: none;
-}
-
-.tools-folder-preview {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.52rem;
-    width: 100%;
-}
-
-.tools-folder-preview-icon {
-    display: grid;
-    place-items: center;
-    aspect-ratio: 1;
-    color: var(--color-gray-300);
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.08);
-    transform: scale(0.92);
-    transition: transform 520ms cubic-bezier(.18, 1.55, .36, 1), opacity 260ms ease;
-}
-
-.tools-folder-preview-icon svg { width: 58%; height: 58%; }
-
-.tools-folder-label {
-    font-size: 0.72rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--text-secondary);
-}
-
-.tools-folder-panel {
-    position: absolute;
-    inset: 0 auto auto 0;
-    z-index: 1;
-    display: grid;
-    grid-template-columns: repeat(4, minmax(44px, 1fr));
-    gap: 1.1rem;
-    width: min(92vw, 430px);
-    min-height: 230px;
-    margin: 0;
-    padding: 1.25rem;
-    pointer-events: none;
-    opacity: 0;
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    border-radius: 38px;
-    background: rgba(18, 18, 20, 0.84);
-    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255,255,255,0.12);
-    backdrop-filter: blur(24px) saturate(1.4);
-    transform: scale(0.58) translateY(-5px);
-    transform-origin: 76px 76px;
-    transition: opacity 260ms ease, transform 560ms cubic-bezier(.2, 1.45, .36, 1);
-}
-
-.tools-folder-panel .skill {
-    width: 54px;
-    height: 54px;
-    padding: 0.7rem;
-    color: var(--color-gray-300);
-    border-radius: 18px;
-    background: rgba(255,255,255,0.075);
-    opacity: 0;
-    transform: translateY(16px) scale(0.72);
-    transition: color 0.25s ease, background 0.25s ease, opacity 360ms ease, transform 520ms cubic-bezier(.18, 1.65, .36, 1);
-    transition-delay: calc(var(--tool-index, 0) * 24ms);
-}
-
-.tools-folder-panel .skill:hover,
-.tools-folder-panel .skill:focus-visible {
-    color: var(--text-primary);
-    background: rgba(255,255,255,0.14);
-    transform: translateY(-5px) scale(1.08, 0.96);
-    outline: none;
-}
-
-.tools-folder.is-open .tools-folder-cover {
-    --folder-ease: cubic-bezier(.2, 1.35, .36, 1);
-    width: min(92vw, 430px);
-    min-height: 230px;
-    border-radius: 38px;
-    opacity: 0.18;
-    pointer-events: none;
-}
-
-.tools-folder.is-open .tools-folder-preview-icon { transform: scale(1.18); opacity: 0; }
-.tools-folder.is-open .tools-folder-panel { pointer-events: auto; opacity: 1; transform: scale(1) translateY(0); }
-.tools-folder.is-open .tools-folder-panel .skill { opacity: 1; transform: translateY(0) scale(1); }
-
-.tools-folder-hint {
-    margin-top: 0.8rem;
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-}
-
-body.light-mode .tools-folder-cover,
-body.light-mode .tools-folder-panel {
-    border-color: rgba(0, 0, 0, 0.09);
-    background: rgba(255, 255, 255, 0.76);
-    box-shadow: 0 22px 65px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255,255,255,0.72);
-}
-
-body.light-mode .tools-folder-preview-icon,
-body.light-mode .tools-folder-panel .skill {
-    color: var(--color-gray-600);
-    background: rgba(0, 0, 0, 0.055);
-}
-
-@media (max-width: 520px) {
-    .tools-folder-panel { grid-template-columns: repeat(3, minmax(44px, 1fr)); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .tools-folder-cover,
-    .tools-folder-panel,
-    .tools-folder-panel .skill,
-    .tools-folder-preview-icon {
-        transition-duration: 1ms !important;
-    }
 }
