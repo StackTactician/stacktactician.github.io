@@ -102,6 +102,10 @@
         right: 1.5rem;
         width: 40px !important;
         height: 40px !important;
+        min-width: 40px !important;
+        min-height: 40px !important;
+        aspect-ratio: 1 / 1 !important;
+        box-sizing: border-box !important;
         font-size: 1.2rem;
         padding: 0 !important;
         border-radius: 50% !important;
@@ -112,8 +116,8 @@
     }
 
     .back-to-top .progress-ring {
-        width: 100% !important;
-        height: 100% !important;
+        width: 40px !important;
+        height: 40px !important;
     }
 
     .social-link-large .reveal-extra {
