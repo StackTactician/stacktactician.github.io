@@ -24,11 +24,6 @@
         /* Hide standard links on mobile */
     }
 
-    .mobile-menu-btn {
-        display: flex;
-        /* Show hamburger */
-    }
-
     .nav-logo-img {
         width: 45px;
         height: 45px;
