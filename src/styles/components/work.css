@@ -4,35 +4,67 @@
     flex-direction: column;
 }
 
-.work-item {
+.work-item-wrapper {
+    position: relative;
+    border-bottom: 1px solid var(--border-color);
+    transition: border-color 0.3s ease;
+}
+
+.work-item-header {
     display: grid;
-    grid-template-columns: 100px 1fr 150px;
+    grid-template-columns: 100px 1fr 180px 40px;
     align-items: center;
     gap: 2rem;
-    padding: 2rem 0;
-    border-bottom: 1px solid var(--color-gray-800);
+    padding: 2.2rem 0;
     cursor: pointer;
     transition: all 0.3s ease;
-
-    /* Scroll Animation Init State */
-    opacity: 0;
-    transform: translateX(-30vw);
-    /* Slide in from far left */
-    transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), padding 0.3s ease, border-color 0.3s ease;
-    will-change: opacity, transform;
 }
 
-.work-item.visible {
-    opacity: 1;
-    transform: translateX(0);
+.work-item-header:hover {
+    padding-left: 0.75rem;
 }
 
-.work-item:hover {
-    padding-left: 1rem;
-    border-color: var(--color-gray-600);
-}
-
-.work-item:hover .work-name {
+.work-item-header:hover .work-name {
     color: var(--text-primary);
-    transform: translateX(10px);
+    transform: translateX(6px);
+}
+
+.work-year {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 300;
+    letter-spacing: 0.05em;
+}
+
+.work-name {
+    font-size: 1.6rem;
+    font-weight: 300;
+    letter-spacing: -0.01em;
+    color: var(--text-primary);
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.work-category {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 300;
+    text-align: right;
+}
+
+.work-toggle {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.toggle-icon {
+    width: 20px;
+    height: 20px;
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }

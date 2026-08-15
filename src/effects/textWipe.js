@@ -98,7 +98,7 @@ export function initWipeElements(selector, options = {}) {
         });
     }, { 
         threshold: settings.threshold,
-        rootMargin: '0px 0px -20px 0px'
+        rootMargin: '0px 0px -40px 0px'
     });
 
     nodes.forEach(node => {
