@@ -44,6 +44,7 @@ initTextWipe('.custom-headline', {
 ## ⚛️ Usage in React / Next.js / Vue
 
 ### React Component Example:
+{% raw %}
 ```jsx
 import { useEffect, useRef } from 'react';
 
@@ -89,3 +90,4 @@ export function TextWipe({ text, className = '' }) {
   );
 }
 ```
+{% endraw %}

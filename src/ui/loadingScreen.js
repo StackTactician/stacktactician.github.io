@@ -100,9 +100,7 @@ export function simulateLoading(callback) {
                     // Step 4: Fade out preloader and initialize the page scripts
                     setTimeout(() => {
                         loadingScreen.classList.add('hidden');
-                        setTimeout(() => {
-                            if (callback) callback();
-                        }, 400); // 400ms delay so the screen is clear and hero wipe is visibly seen!
+                        if (callback) callback();
                     }, 1000); // 1000ms shimmer visibility & fade duration
                 }
             }

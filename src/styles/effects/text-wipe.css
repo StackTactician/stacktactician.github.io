@@ -6,25 +6,25 @@
     display: inline-flex;
     overflow: hidden;
     vertical-align: top;
-    margin-right: 0.28em;
-    padding-bottom: 0.12em; /* Protect descenders (g, y, p, q, j) */
+    margin-right: 0.26em;
+    padding-bottom: 0.08em; /* Prevent descender clipping (g, y, p, q, j) */
     line-height: inherit;
 }
 
 .animation-segment-wrapper .animation-segment-interior {
     display: inline-block;
-    transform: translate3d(0, 118%, 0);
     opacity: 0;
-    transition: transform 0.85s cubic-bezier(0.19, 1, 0.22, 1), 
-                opacity 0.2s ease-out;
+    transform: translate3d(0, 108%, 0);
+    transition-property: transform, opacity;
+    transition-duration: 0.85s;
+    transition-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
     will-change: transform, opacity;
-    backface-visibility: hidden;
 }
 
 .animation-segment-wrapper.animation-segmented-flex-fired .animation-segment-interior,
 .animation-segmented-flex-fired .animation-segment-interior {
-    transform: translate3d(0, 0, 0);
     opacity: 1;
+    transform: translate3d(0, 0, 0);
 }
 
 /* Accessibility: Respect reduced motion preference */
