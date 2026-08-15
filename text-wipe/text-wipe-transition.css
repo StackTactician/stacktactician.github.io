@@ -1,0 +1,31 @@
+/* ==========================================================================
+   OLIVINE MARKETING — EXACT TEXT WIPE-UP TRANSITION (CSS ONLY)
+   Extracted directly from olivinemarketing.com source code.
+   ========================================================================== */
+
+/* 1. Parent Segment Wrapper (Masking Container) */
+.animation-segment-wrapper {
+  display: inline-flex;
+  overflow: hidden;
+  vertical-align: top;
+  margin-right: 0.28em;
+}
+
+/* 2. Primed State (Hidden State before animation fires) */
+.animation-segment-wrapper .animation-segment-interior {
+  display: inline-block;
+  opacity: 0;
+  transform: translate(0, 105%);
+  transition-property: transform, opacity;
+  transition-duration: 0.85s;
+  transition-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
+  will-change: transform, opacity;
+}
+
+/* 3. Fired State (Visible State when triggered) */
+.animation-segment-wrapper.animation-segmented-flex-fired .animation-segment-interior,
+.animation-segmented-flex-fired .animation-segment-interior,
+.is-revealed .animation-segment-interior {
+  opacity: 1;
+  transform: translate(0, 0);
+}

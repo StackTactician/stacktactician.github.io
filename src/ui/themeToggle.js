@@ -31,13 +31,49 @@ export function initThemeToggle({ getScene = () => null } = {}) {
     }
 
     const handleToggle = () => {
-        isLightMode = !isLightMode;
-        document.body.classList.toggle('light-mode', isLightMode);
-        localStorage.setItem('theme', isLightMode ? 'light' : 'dark');
+        const changeTheme = () => {
+            isLightMode = !isLightMode;
+            document.body.classList.toggle('light-mode', isLightMode);
+            localStorage.setItem('theme', isLightMode ? 'light' : 'dark');
 
-        updateUI(isLightMode);
-        const scene = getScene();
-        if (scene) scene.setLightMode(isLightMode);
+            updateUI(isLightMode);
+            const scene = getScene();
+            if (scene) scene.setLightMode(isLightMode);
+        };
+
+        // Fallback for browsers without View Transition support or if user prefers reduced motion
+        if (!document.startViewTransition || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            changeTheme();
+            return;
+        }
+
+        // Mubarak's special goof: transition from a random coordinates each time
+        const x = Math.random() * window.innerWidth;
+        const y = Math.random() * window.innerHeight;
+
+        // Calculate distance to the furthest corner to guarantee coverage
+        const endRadius = Math.hypot(
+            Math.max(x, window.innerWidth - x),
+            Math.max(y, window.innerHeight - y)
+        );
+
+        const transition = document.startViewTransition(changeTheme);
+
+        transition.ready.then(() => {
+            document.documentElement.animate(
+                {
+                    clipPath: [
+                        `circle(0px at ${x}px ${y}px)`,
+                        `circle(${endRadius}px at ${x}px ${y}px)`
+                    ]
+                },
+                {
+                    duration: 450, // Snappy responsive speed
+                    easing: 'ease-in-out',
+                    pseudoElement: '::view-transition-new(root)'
+                }
+            );
+        });
     };
 
     if (toggleBtn) toggleBtn.addEventListener('click', handleToggle);

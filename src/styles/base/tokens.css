@@ -32,7 +32,7 @@
 /* Light mode overrides */
 /* Light mode overrides */
 body.light-mode {
-    --bg-primary: #e4e4e7;
+    --bg-primary: #f5f0e8;
     /* Slightly darker/grayer than #f4f4f5 to reduce glare */
     --bg-secondary: var(--color-gray-100);
     --text-primary: var(--color-black);

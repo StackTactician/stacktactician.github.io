@@ -1,0 +1,41 @@
+/* ==========================================================================
+   Olivine-Style Text Wipe-Up Animation
+   ========================================================================== */
+
+.animation-segment-wrapper {
+    display: inline-flex;
+    overflow: hidden;
+    vertical-align: top;
+    margin-right: 0.26em;
+    padding-bottom: 0.08em; /* Prevent descender clipping (g, y, p, q, j) */
+    line-height: inherit;
+}
+
+.animation-segment-wrapper .animation-segment-interior {
+    display: inline-block;
+    opacity: 0;
+    transform: translate3d(0, 108%, 0);
+    transition-property: transform, opacity;
+    transition-duration: 0.85s;
+    transition-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
+    will-change: transform, opacity;
+}
+
+.animation-segment-wrapper.animation-segmented-flex-fired .animation-segment-interior,
+.animation-segmented-flex-fired .animation-segment-interior {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+}
+
+/* Accessibility: Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+    .animation-segment-wrapper {
+        overflow: visible;
+    }
+
+    .animation-segment-wrapper .animation-segment-interior {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+    }
+}

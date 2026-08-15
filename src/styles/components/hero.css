@@ -33,13 +33,13 @@
     margin-bottom: 2rem;
 }
 
-.hero-title span {
+.hero-title > span {
     display: block;
     cursor: default;
     transition: all 0.2s ease;
 }
 
-.hero-title span:nth-child(2) {
+.hero-title > span:nth-child(2) {
     font-weight: 600;
 }
 

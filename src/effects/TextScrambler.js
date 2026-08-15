@@ -60,7 +60,7 @@ export class TextScrambler {
 
 export function initTextScramble() {
     // Hero Title Spans
-    const heroSpans = document.querySelectorAll('.hero-title span');
+    const heroSpans = document.querySelectorAll('.hero-title > span');
     heroSpans.forEach(span => new TextScrambler(span));
 
     // Section Titles
